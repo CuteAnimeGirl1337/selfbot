@@ -357,6 +357,31 @@ const commandList = [
   ['summarize', 'AI summarize replied message'],
   ['explain', 'AI explain a topic'],
   ['code', 'AI write code'],
+  // -- Stealth --
+  ['ghost', 'Toggle ghost read (no read receipts)'],
+  ['invistype', 'Toggle invisible typing'],
+  ['humanmode', 'Toggle human-like delays'],
+  ['stealthstatus', 'Show stealth mode status'],
+  // -- Protection --
+  ['raidprotect', 'Toggle raid protection for server'],
+  ['protectstatus', 'Show protection status'],
+  // -- Token Protector --
+  ['tokenprotect', 'Toggle token protection'],
+  ['protectorstatus', 'Show protector alerts'],
+  // -- Evasion --
+  ['evasion', 'Toggle selfbot detection evasion'],
+  ['evasionstatus', 'Show evasion stats'],
+  // -- Message Logger --
+  ['logserver', 'Toggle message logging for server'],
+  ['logchannel', 'Toggle logging for channel'],
+  ['logsearch', 'Search logged messages'],
+  ['logstats', 'Show logging stats'],
+  // -- Server Cloner --
+  ['cloneserver', 'Clone server structure to another server'],
+  ['exportserver', 'Export server as JSON'],
+  // -- Webhook Cloner --
+  ['sendas', 'Send message as another user via webhook'],
+  ['impersonate', 'Impersonate user for next N messages'],
 ];
 
 // Broadcast function for WebSocket
@@ -4408,6 +4433,188 @@ client.on('messageCreate', async (message) => {
       const answer = (data.choices?.[0]?.message?.content || 'No response.').slice(0, 1900);
       await message.reply(answer);
     } catch (e) { await message.reply(`AI error: ${e.message}`); }
+  }
+
+  // ========== STEALTH ==========
+  else if (command === 'ghost') {
+    try {
+      const stealth = require('./stealth');
+      stealth.setState('ghostRead', !stealth.getState().ghostRead);
+      await message.reply(`Ghost read: **${stealth.getState().ghostRead ? 'ON' : 'OFF'}**`);
+    } catch { await message.reply('Stealth module not available.'); }
+  }
+
+  else if (command === 'invistype') {
+    try {
+      const stealth = require('./stealth');
+      stealth.setState('invisibleTyping', !stealth.getState().invisibleTyping);
+      await message.reply(`Invisible typing: **${stealth.getState().invisibleTyping ? 'ON' : 'OFF'}**`);
+    } catch { await message.reply('Stealth module not available.'); }
+  }
+
+  else if (command === 'humanmode') {
+    try {
+      const stealth = require('./stealth');
+      stealth.setState('delayedResponses', !stealth.getState().delayedResponses);
+      await message.reply(`Human mode: **${stealth.getState().delayedResponses ? 'ON' : 'OFF'}**`);
+    } catch { await message.reply('Stealth module not available.'); }
+  }
+
+  else if (command === 'stealthstatus') {
+    try {
+      const stealth = require('./stealth');
+      const s = stealth.getState();
+      await message.reply(`**Stealth Status:**\nGhost Read: ${s.ghostRead ? '\u2705' : '\u274c'}\nInvisible Typing: ${s.invisibleTyping ? '\u2705' : '\u274c'}\nHuman Mode: ${s.delayedResponses ? '\u2705' : '\u274c'}`);
+    } catch { await message.reply('Stealth module not available.'); }
+  }
+
+  // ========== RAID PROTECTION ==========
+  else if (command === 'raidprotect') {
+    try {
+      const rp = require('./raidprotect');
+      if (!message.guild) return message.reply('Server only.');
+      if (rp.isProtected(message.guild.id)) { rp.disable(message.guild.id); await message.reply('Raid protection **disabled**.'); }
+      else { rp.enable(message.guild.id); await message.reply('Raid protection **enabled** for this server.'); }
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'protectstatus') {
+    try {
+      const rp = require('./raidprotect');
+      if (!message.guild) return message.reply('Server only.');
+      const protected_ = rp.isProtected(message.guild.id);
+      const events = rp.getEventLog(message.guild.id, 5);
+      let reply = `**Raid Protection:** ${protected_ ? '\u2705 Enabled' : '\u274c Disabled'}`;
+      if (events.length) reply += `\n**Recent events:**\n${events.map(e => `${e.type} — <t:${Math.floor(e.time/1000)}:R>`).join('\n')}`;
+      await message.reply(reply);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  // ========== TOKEN PROTECTOR ==========
+  else if (command === 'tokenprotect') {
+    try {
+      const p = require('./protector');
+      p.setState('enabled', !p.getState().enabled);
+      await message.reply(`Token protection: **${p.getState().enabled ? 'ON' : 'OFF'}**`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'protectorstatus') {
+    try {
+      const p = require('./protector');
+      const s = p.getState();
+      const alerts = p.getAlerts().slice(0, 5);
+      let reply = `**Token Protector:** ${s.enabled ? '\u2705 ON' : '\u274c OFF'}\nAuto-block: ${s.autoBlock ? 'ON' : 'OFF'}\nAlerts: ${p.getAlerts().length}`;
+      if (alerts.length) reply += `\n**Recent:**\n${alerts.map(a => `\u26a0\ufe0f ${a.from}: ${a.reason}`).join('\n')}`;
+      await message.reply(reply);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  // ========== EVASION ==========
+  else if (command === 'evasion') {
+    try {
+      const ev = require('./evasion');
+      ev.setState('enabled', !ev.getState().enabled);
+      await message.reply(`Evasion mode: **${ev.getState().enabled ? 'ON' : 'OFF'}**`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'evasionstatus') {
+    try {
+      const ev = require('./evasion');
+      const s = ev.getState();
+      const stats = ev.getStats();
+      await message.reply(`**Evasion Status:**\nEnabled: ${s.enabled ? '\u2705' : '\u274c'}\nRate limit: ${s.maxCommandsPerMinute}/min\nCommands (last min): ${stats.commandsLastMinute}\nThrottled: ${stats.isThrottled ? '\u26a0\ufe0f YES' : 'No'}`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  // ========== MESSAGE LOGGER ==========
+  else if (command === 'logserver') {
+    try {
+      const ml = require('./msglogger');
+      if (!message.guild) return message.reply('Server only.');
+      if (ml.isLogging(message.guild.id)) { ml.disableGuild(message.guild.id); await message.reply('Logging **disabled** for this server.'); }
+      else { ml.enableGuild(message.guild.id); await message.reply('Logging **enabled** for this server.'); }
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'logchannel') {
+    try {
+      const ml = require('./msglogger');
+      const ch = message.mentions.channels.first() || message.channel;
+      ml.enableChannel(ch.id);
+      await message.reply(`Logging **enabled** for #${ch.name}.`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'logsearch') {
+    try {
+      const ml = require('./msglogger');
+      const query = args.join(' ');
+      if (!query) return message.reply('Usage: `logsearch <text>`');
+      const results = ml.search(query, { limit: 10 });
+      if (!results.length) return message.reply('No results.');
+      const lines = results.map(m => `**${m.authorTag}** in #${m.channelName}: ${m.content.slice(0, 80)}`);
+      await message.reply(`**Search results for "${query}":**\n${lines.join('\n')}`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  else if (command === 'logstats') {
+    try {
+      const ml = require('./msglogger');
+      const stats = ml.getStats();
+      await message.reply(`**Message Logger:**\nTotal logged: ${stats.totalLogged.toLocaleString()}\nGuilds: ${Object.keys(stats.byGuild).length}\nEnabled: ${ml.getState().enabled ? '\u2705' : '\u274c'}`);
+    } catch { await message.reply('Module not available.'); }
+  }
+
+  // ========== SERVER CLONER ==========
+  else if (command === 'cloneserver') {
+    try {
+      const cloner = require('./cloner');
+      const targetId = args[0];
+      if (!message.guild || !targetId) return message.reply('Usage: `cloneserver <target server ID>`');
+      const target = client.guilds.cache.get(targetId);
+      if (!target) return message.reply('Target server not found.');
+      await message.reply('\ud83d\udd04 Cloning server... This may take a while.');
+      const result = await cloner.cloneServer(message.guild, target, { clearTarget: false, copyEmojis: true, copyIdentity: false });
+      await message.reply(`\u2705 **Clone complete!**\nRoles: ${result.rolesCreated}\nChannels: ${result.channelsCreated}\nEmojis: ${result.emojisCreated}\nErrors: ${result.errors.length}`);
+    } catch (e) { await message.reply(`Failed: ${e.message}`); }
+  }
+
+  else if (command === 'exportserver') {
+    try {
+      const cloner = require('./cloner');
+      if (!message.guild) return message.reply('Server only.');
+      const data = await cloner.exportServer(message.guild);
+      await message.reply(`\ud83d\udce6 Server exported: ${data.roles.length} roles, ${data.channels.length} channels, ${data.emojis.length} emojis`);
+    } catch (e) { await message.reply(`Failed: ${e.message}`); }
+  }
+
+  // ========== WEBHOOK CLONER ==========
+  else if (command === 'sendas') {
+    try {
+      const wc = require('./webhookcloner');
+      const user = message.mentions.users.first();
+      if (!user) return message.reply('Usage: `sendas @user <message>`');
+      const text = args.slice(1).join(' ');
+      if (!text) return message.reply('Provide a message.');
+      await message.delete().catch(() => null);
+      await wc.sendAs(message.channel, user, text);
+    } catch (e) { await message.reply(`Failed: ${e.message}`); }
+  }
+
+  else if (command === 'impersonate') {
+    try {
+      const wc = require('./webhookcloner');
+      const user = message.mentions.users.first();
+      const count = parseInt(args[1]) || 1;
+      if (!user) return message.reply('Usage: `impersonate @user <count>`');
+      await message.reply(`Impersonating **${user.tag}** for next ${count} messages they send.`);
+      const collector = message.channel.createMessageCollector({ filter: m => m.author.id === user.id, max: count, time: 60000 });
+      collector.on('collect', async (m) => {
+        await wc.sendAs(message.channel, client.user, m.content).catch(() => null);
+      });
+    } catch (e) { await message.reply(`Failed: ${e.message}`); }
   }
 
   // ========== HELP ==========

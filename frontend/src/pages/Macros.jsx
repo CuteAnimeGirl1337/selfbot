@@ -38,7 +38,7 @@ export default function Macros({ api }) {
   }
 
   const del = async (n) => {
-    await fetch(`/api/macros/${n}`, { method: 'DELETE' })
+    try { await fetch(`/api/macros/${n}`, { method: 'DELETE' }) } catch {}
     toast('Macro deleted')
     fetch_()
   }

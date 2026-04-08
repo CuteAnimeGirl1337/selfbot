@@ -84,7 +84,7 @@ export default function Alerts({ api }) {
   }
 
   const deleteAlert = async (id) => {
-    await fetch(`/api/alerts/${id}`, { method: 'DELETE' })
+    try { await fetch(`/api/alerts/${id}`, { method: 'DELETE' }) } catch {}
     toast('Alert removed')
     fetchAlerts()
   }

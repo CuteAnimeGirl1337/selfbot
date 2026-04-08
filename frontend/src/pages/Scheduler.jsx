@@ -45,7 +45,7 @@ export default function Scheduler({ api }) {
   }
 
   const del = async (id) => {
-    await fetch(`/api/scheduler/${id}`, { method: 'DELETE' })
+    try { await fetch(`/api/scheduler/${id}`, { method: 'DELETE' }) } catch {}
     toast('Scheduled message deleted')
     fetch_()
   }

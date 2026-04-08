@@ -25,6 +25,13 @@ try { archiveMod = require('./archive'); } catch { archiveMod = null; }
 const tokenMgr = require('./token');
 let accountsMod;
 try { accountsMod = require('./accounts'); } catch { accountsMod = null; }
+let stealthMod; try { stealthMod = require('./stealth'); } catch { stealthMod = null; }
+let protectorMod; try { protectorMod = require('./protector'); } catch { protectorMod = null; }
+let evasionMod; try { evasionMod = require('./evasion'); } catch { evasionMod = null; }
+let raidprotectMod; try { raidprotectMod = require('./raidprotect'); } catch { raidprotectMod = null; }
+let msgloggerMod; try { msgloggerMod = require('./msglogger'); } catch { msgloggerMod = null; }
+let clonerMod; try { clonerMod = require('./cloner'); } catch { clonerMod = null; }
+let webhookclonerMod; try { webhookclonerMod = require('./webhookcloner'); } catch { webhookclonerMod = null; }
 
 const app = express();
 const server = http.createServer(app);
@@ -1206,6 +1213,135 @@ app.post('/api/accounts/:name/switch', async (req, res) => {
   }
 });
 
+// ========== Stealth API ==========
+app.get('/api/stealth', (req, res) => {
+  if (!stealthMod) return res.status(500).json({ error: 'Stealth module not loaded' });
+  res.json(stealthMod.getState());
+});
+app.post('/api/stealth', (req, res) => {
+  if (!stealthMod) return res.status(500).json({ error: 'Stealth module not loaded' });
+  const { key, value } = req.body;
+  stealthMod.setState(key, value);
+  res.json(stealthMod.getState());
+});
+
+// ========== Token Protector API ==========
+app.get('/api/protector', (req, res) => {
+  if (!protectorMod) return res.status(500).json({ error: 'Protector module not loaded' });
+  res.json({ state: protectorMod.getState(), alerts: protectorMod.getAlerts() });
+});
+app.post('/api/protector', (req, res) => {
+  if (!protectorMod) return res.status(500).json({ error: 'Protector module not loaded' });
+  const { key, value } = req.body;
+  protectorMod.setState(key, value);
+  res.json(protectorMod.getState());
+});
+
+// ========== Evasion API ==========
+app.get('/api/evasion', (req, res) => {
+  if (!evasionMod) return res.status(500).json({ error: 'Evasion module not loaded' });
+  res.json({ state: evasionMod.getState(), stats: evasionMod.getStats() });
+});
+app.post('/api/evasion', (req, res) => {
+  if (!evasionMod) return res.status(500).json({ error: 'Evasion module not loaded' });
+  const { key, value } = req.body;
+  evasionMod.setState(key, value);
+  res.json(evasionMod.getState());
+});
+
+// ========== Raid Protection API ==========
+app.get('/api/raidprotect', (req, res) => {
+  if (!raidprotectMod) return res.status(500).json({ error: 'Raid protection module not loaded' });
+  res.json(raidprotectMod.getState());
+});
+app.post('/api/raidprotect/toggle', (req, res) => {
+  if (!raidprotectMod) return res.status(500).json({ error: 'Raid protection module not loaded' });
+  const { guildId } = req.body;
+  if (!guildId) return res.status(400).json({ error: 'guildId required' });
+  if (raidprotectMod.isProtected(guildId)) { raidprotectMod.disable(guildId); }
+  else { raidprotectMod.enable(guildId); }
+  res.json({ protected: raidprotectMod.isProtected(guildId) });
+});
+app.get('/api/raidprotect/events', (req, res) => {
+  if (!raidprotectMod) return res.status(500).json({ error: 'Raid protection module not loaded' });
+  const guildId = req.query.guildId;
+  const limit = parseInt(req.query.limit) || 20;
+  if (!guildId) return res.status(400).json({ error: 'guildId required' });
+  res.json(raidprotectMod.getEventLog(guildId, limit));
+});
+
+// ========== Message Logger API ==========
+app.get('/api/msglogger', (req, res) => {
+  if (!msgloggerMod) return res.status(500).json({ error: 'Message logger module not loaded' });
+  res.json({ state: msgloggerMod.getState(), stats: msgloggerMod.getStats() });
+});
+app.post('/api/msglogger/toggle', (req, res) => {
+  if (!msgloggerMod) return res.status(500).json({ error: 'Message logger module not loaded' });
+  const { guildId, channelId } = req.body;
+  if (channelId) {
+    msgloggerMod.enableChannel(channelId);
+    res.json({ ok: true, channelId });
+  } else if (guildId) {
+    if (msgloggerMod.isLogging(guildId)) { msgloggerMod.disableGuild(guildId); }
+    else { msgloggerMod.enableGuild(guildId); }
+    res.json({ ok: true, logging: msgloggerMod.isLogging(guildId) });
+  } else {
+    res.status(400).json({ error: 'guildId or channelId required' });
+  }
+});
+app.post('/api/msglogger/search', (req, res) => {
+  if (!msgloggerMod) return res.status(500).json({ error: 'Message logger module not loaded' });
+  const { query, authorId, guildId, limit } = req.body;
+  res.json(msgloggerMod.search(query, { authorId, guildId, limit: limit || 50 }));
+});
+app.get('/api/msglogger/messages', (req, res) => {
+  if (!msgloggerMod) return res.status(500).json({ error: 'Message logger module not loaded' });
+  const limit = parseInt(req.query.limit) || 50;
+  const offset = parseInt(req.query.offset) || 0;
+  res.json(msgloggerMod.getMessages(limit, offset));
+});
+
+// ========== Server Cloner API ==========
+app.post('/api/cloner/clone', async (req, res) => {
+  if (!clonerMod) return res.status(500).json({ error: 'Cloner module not loaded' });
+  const { sourceGuildId, targetGuildId, options } = req.body;
+  if (!sourceGuildId || !targetGuildId) return res.status(400).json({ error: 'sourceGuildId and targetGuildId required' });
+  const source = client.guilds.cache.get(sourceGuildId);
+  const target = client.guilds.cache.get(targetGuildId);
+  if (!source) return res.status(404).json({ error: 'Source server not found' });
+  if (!target) return res.status(404).json({ error: 'Target server not found' });
+  try {
+    const result = await clonerMod.cloneServer(source, target, options || {});
+    res.json(result);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.post('/api/cloner/export', async (req, res) => {
+  if (!clonerMod) return res.status(500).json({ error: 'Cloner module not loaded' });
+  const { guildId } = req.body;
+  if (!guildId) return res.status(400).json({ error: 'guildId required' });
+  const guild = client.guilds.cache.get(guildId);
+  if (!guild) return res.status(404).json({ error: 'Server not found' });
+  try {
+    const data = await clonerMod.exportServer(guild);
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ========== Webhook Cloner API ==========
+app.post('/api/webhookcloner/sendas', async (req, res) => {
+  if (!webhookclonerMod) return res.status(500).json({ error: 'Webhook cloner module not loaded' });
+  const { channelId, userId, content } = req.body;
+  if (!channelId || !userId || !content) return res.status(400).json({ error: 'channelId, userId, and content required' });
+  const channel = client.channels.cache.get(channelId);
+  if (!channel) return res.status(404).json({ error: 'Channel not found' });
+  const user = client.users.cache.get(userId) || await client.users.fetch(userId).catch(() => null);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  try {
+    await webhookclonerMod.sendAs(channel, user, content);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -1278,12 +1414,41 @@ function startServer(port) {
     if (archiveMod) archiveMod.archiveDeleted(message, broadcast);
   });
 
+  // Token protector
+  if (protectorMod) {
+    client.on('messageCreate', (msg) => {
+      if (msg.author.id === client.user?.id) return;
+      const result = protectorMod.checkMessage(msg);
+      if (result?.suspicious) {
+        broadcast({ type: 'protector-alert', data: { from: msg.author.tag, reason: result.reason, channel: msg.channel.name, time: Date.now() } });
+        log('warn', `Token protector: ${result.reason} from ${msg.author.tag}`);
+      }
+    });
+  }
+
+  // Raid protection
+  if (raidprotectMod) {
+    client.on('guildBanAdd', (ban) => { if (raidprotectMod.isProtected(ban.guild.id)) raidprotectMod.trackEvent(ban.guild, 'ban', null, ban.user.id); });
+    client.on('channelDelete', (ch) => { if (ch.guild && raidprotectMod.isProtected(ch.guild.id)) raidprotectMod.trackEvent(ch.guild, 'channelDelete', null, ch.id); });
+    client.on('roleDelete', (role) => { if (role.guild && raidprotectMod.isProtected(role.guild.id)) raidprotectMod.trackEvent(role.guild, 'roleDelete', null, role.id); });
+  }
+
+  // Message logger
+  if (msgloggerMod) {
+    client.on('messageCreate', (msg) => { msgloggerMod.logMessage(msg); });
+  }
+
   // Periodic save for new modules
   setInterval(() => {
     if (trackerMod) trackerMod.save();
     if (alertsMod) alertsMod.save();
     if (analyticsMod) analyticsMod.save();
     if (archiveMod) archiveMod.save();
+    if (msgloggerMod && msgloggerMod.save) msgloggerMod.save();
+    if (raidprotectMod && raidprotectMod.save) raidprotectMod.save();
+    if (protectorMod && protectorMod.save) protectorMod.save();
+    if (evasionMod && evasionMod.save) evasionMod.save();
+    if (stealthMod && stealthMod.save) stealthMod.save();
   }, 120000);
 
   if (authMod) log('info', `Dashboard auth token: ${authMod.getToken()}`);

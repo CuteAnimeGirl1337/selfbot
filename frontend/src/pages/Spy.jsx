@@ -96,8 +96,8 @@ export default function Spy({ api, spyLog }) {
               <input value={arText} onChange={e => setArText(e.target.value)} placeholder="Reply text..." style={s.input} />
               <button onClick={addAutoReply} style={s.btn}>Add</button>
             </div>
-            {Object.entries(autoReplies).length === 0 && <div style={s.nil}>No auto-replies</div>}
-            {Object.entries(autoReplies).map(([id, text]) => (
+            {Object.entries(autoReplies || {}).length === 0 && <div style={s.nil}>No auto-replies</div>}
+            {Object.entries(autoReplies || {}).map(([id, text]) => (
               <div key={id} style={s.targetRow}>
                 <span style={s.targetId}>{id}</span>
                 <span style={s.arText}>{text}</span>
