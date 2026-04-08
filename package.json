@@ -1,0 +1,59 @@
+{
+  "name": "selfbot-dashboard",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dr",
+    "email": "dr@selfbot.local"
+  },
+  "homepage": "https://github.com/Dr/selfbot",
+  "description": "Discord selfbot with web dashboard",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node index.js",
+    "app": "electron .",
+    "build-linux": "electron-builder --linux",
+    "build-win": "electron-builder --win",
+    "build-all": "electron-builder --linux --win",
+    "dev": "node index.js & sleep 2 && electron ."
+  },
+  "dependencies": {
+    "debug": "^4.4.3",
+    "discord.js-selfbot-v13": "^3.7.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.selfbot.dashboard",
+    "productName": "Selfbot Dashboard",
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    },
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "*.js",
+      "plugins/**/*",
+      "node_modules/**/*",
+      "package.json",
+      ".env"
+    ],
+    "extraResources": [
+      { "from": "data.json", "to": "data.json", "filter": ["**/*"] }
+    ],
+    "asar": true
+  }
+}

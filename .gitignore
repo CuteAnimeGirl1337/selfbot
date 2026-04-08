@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build output
+dist/
+public/assets/
+public/index.html
+
+# Secrets & user data
+.env
+token.json
+auth.json
+accounts.json
+data.json
+*-data.json
+
+# Logs
+*.log
+/tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Electron build cache
+.electron-builder/
