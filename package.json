@@ -1,7 +1,10 @@
 {
   "name": "selfbot-dashboard",
   "version": "1.0.0",
-  "author": "CuteAnimeGirl1337",
+  "author": {
+    "name": "CuteAnimeGirl1337",
+    "email": "noreply@users.noreply.github.com"
+  },
   "homepage": "https://github.com/CuteAnimeGirl1337/selfbot",
   "description": "Discord selfbot with web dashboard",
   "main": "electron/main.js",
@@ -48,9 +51,6 @@
       "package.json",
       ".env"
     ],
-    "extraResources": [
-      { "from": "data.json", "to": "data.json", "filter": ["**/*"] }
-    ],
-    "asar": true
+"asar": true
   }
 }
