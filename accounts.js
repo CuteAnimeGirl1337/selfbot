@@ -11,7 +11,11 @@ function load() {
 }
 
 function save() {
-  fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
+  try {
+    fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
+  } catch (e) {
+    console.error('[accounts] Failed to save:', e.message);
+  }
 }
 
 function addAccount(name, token) {

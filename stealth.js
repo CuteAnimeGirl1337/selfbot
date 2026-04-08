@@ -24,6 +24,7 @@ function setState(key, value) {
 
 function shouldDelay() {
   if (!state.delayedResponses) return Promise.resolve();
+  if (state.maxDelay <= state.minDelay) return Promise.resolve();
   const delay = Math.floor(Math.random() * (state.maxDelay - state.minDelay + 1)) + state.minDelay;
   return new Promise((resolve) => setTimeout(resolve, delay));
 }

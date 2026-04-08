@@ -55,6 +55,13 @@ function checkAntiSpam(userId) {
     return { action: 'warn', reason: `Anti-spam: ${userMessageLog[userId].length} messages in ${rules.antiSpam.interval}ms` };
   }
 
+  // Clean up old entries from other users to prevent memory leak
+  const cutoff = Date.now() - (rules.antiSpam.interval || 5000) * 10;
+  for (const uid in userMessageLog) {
+    userMessageLog[uid] = userMessageLog[uid].filter(t => t > cutoff);
+    if (userMessageLog[uid].length === 0) delete userMessageLog[uid];
+  }
+
   return null;
 }
 

@@ -24,9 +24,9 @@ function cacheMessage(message) {
 
     if (!messageCache.has(channelId)) {
       // Evict oldest channel if at capacity
-      if (messageCache.size >= MAX_CACHED_CHANNELS) {
+      if (messageCache.size >= MAX_CACHED_CHANNELS && messageCache.size > 0) {
         const firstKey = messageCache.keys().next().value;
-        messageCache.delete(firstKey);
+        if (firstKey !== undefined) messageCache.delete(firstKey);
       }
       messageCache.set(channelId, new Map());
     }

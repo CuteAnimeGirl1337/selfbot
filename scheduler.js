@@ -51,9 +51,7 @@ function startScheduler(client) {
     for (const entry of due) {
       try {
         const channel = await client.channels.fetch(entry.channelId);
-        if (channel && channel.isText && channel.isText()) {
-          await channel.send(entry.message);
-        } else if (channel && typeof channel.send === 'function') {
+        if (channel && typeof channel.send === 'function') {
           await channel.send(entry.message);
         } else {
           console.error(`[scheduler] Channel ${entry.channelId} not found or not a text channel`);

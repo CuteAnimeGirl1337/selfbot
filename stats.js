@@ -60,7 +60,7 @@ class Stats {
   getLeaderboard(type = 'balance') {
     return Object.entries(this.economy)
       .map(([id, p]) => ({ id, tag: p.tag, balance: p.balance, bank: p.bank, total: p.balance + p.bank, wins: p.wins, level: p.level }))
-      .sort((a, b) => b[type] || b.total - (a[type] || a.total))
+      .sort((a, b) => (b[type] ?? b.total) - (a[type] ?? a.total))
       .slice(0, 15);
   }
 

@@ -103,7 +103,8 @@ export default function TerminalPage({ api, state }) {
 
   const formatText = (text) => {
     if (!text) return ''
-    return text
+    let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    return safe
       .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
       .replace(/\*(.+?)\*/g, '<i>$1</i>')
       .replace(/`([^`]+)`/g, '<code style="background:var(--bg-3);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:12px">$1</code>')

@@ -2304,7 +2304,7 @@ client.on('messageCreate', async (message) => {
     const suits = ['♠', '♥', '♦', '♣'];
     const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
     const deck = [];
-    for (const s of suits) for (const r of ranks) deck.push({ rank: r, suit: s });
+    for (let d = 0; d < 6; d++) for (const s of suits) for (const r of ranks) deck.push({ rank: r, suit: s });
     for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
 
     const cardVal = (hand) => {
@@ -2386,7 +2386,7 @@ client.on('messageCreate', async (message) => {
           result = 'win'; profit = bet;
           p.balance += bet;
           p.wins++;
-          if (bet > p.biggestWin) p.biggestWin = bet;
+          if (profit > p.biggestWin) p.biggestWin = profit;
         } else if (playerTotal === dealerTotal) {
           result = 'push'; profit = 0;
         } else {
@@ -2833,7 +2833,7 @@ client.on('messageCreate', async (message) => {
       } else if (sub === 'list') {
         const list = schedulerMod.getScheduled();
         if (!list.length) return message.reply('No scheduled messages.');
-        const lines = list.map(s => `\`${s.id.slice(0,6)}\` — <t:${Math.floor(s.sendAt/1000)}:R> ${s.message.slice(0,40)}`);
+        const lines = list.map(s => `\`${String(s.id).slice(0,6)}\` — <t:${Math.floor(s.sendAt/1000)}:R> ${s.message.slice(0,40)}`);
         await message.reply(`**Scheduled:**\n${lines.join('\n')}`);
       } else if (sub === 'clear') {
         schedulerMod.scheduled.length = 0;

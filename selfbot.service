@@ -1,12 +1,18 @@
+# Selfbot Dashboard — systemd service
+# Install: edit User/WorkingDirectory/ExecStart, then:
+#   sudo cp selfbot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now selfbot
+
 [Unit]
 Description=Selfbot Dashboard
 After=network.target
 
 [Service]
 Type=simple
-User=Dr
-WorkingDirectory=/home/Dr/selfbot
-ExecStart=/usr/bin/node /home/Dr/selfbot/index.js
+# CHANGE THESE to match your system:
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/selfbot
+ExecStart=/usr/bin/node /home/YOUR_USERNAME/selfbot/index.js
 Restart=on-failure
 RestartSec=5
 Environment=NODE_ENV=production

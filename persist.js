@@ -71,8 +71,12 @@ function startAutoSave(statsFn, interval = 60000) {
 
   const shutdown = () => {
     console.log('[persist] Saving data before exit...');
-    const { stats, config, macros, scheduledMessages } = statsFn();
-    save(stats, config, macros, scheduledMessages);
+    try {
+      const data = statsFn();
+      save(data.stats, data.config, data.macros, data.scheduledMessages);
+    } catch (e) {
+      console.error('[persist] Save failed on exit:', e.message);
+    }
     if (autoSaveTimer) clearInterval(autoSaveTimer);
     process.exit(0);
   };

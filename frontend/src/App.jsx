@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useState, useMemo, useEffect, useCallback, lazy, Suspense, Component } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSocket } from './hooks/useSocket'
 import { useTheme } from './hooks/useTheme'
@@ -227,11 +227,33 @@ function AppInner() {
   )
 }
 
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null } }
+  static getDerivedStateFromError(error) { return { error } }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#050506', color: '#f0f0f2', fontFamily: 'Inter, system-ui, sans-serif', gap: 12 }}>
+          <div style={{ fontSize: 48 }}>💥</div>
+          <h2 style={{ fontSize: 20, fontWeight: 600 }}>Something went wrong</h2>
+          <p style={{ fontSize: 14, color: '#5a5a65', maxWidth: 400, textAlign: 'center' }}>{this.state.error?.message || 'Unknown error'}</p>
+          <button onClick={() => window.location.reload()} style={{ marginTop: 8, padding: '10px 20px', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', border: 'none', borderRadius: 10, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            Reload
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 export default function App() {
   return (
-    <ToastProvider>
-      <AppInner />
-    </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <AppInner />
+      </ToastProvider>
+    </ErrorBoundary>
   )
 }
 

@@ -21,7 +21,8 @@ function setState(key, val) {
 
 function pruneTimestamps(arr) {
   const cutoff = Date.now() - 60000;
-  while (arr.length > 0 && arr[0] < cutoff) {
+  let guard = 0;
+  while (arr.length > 0 && arr[0] < cutoff && guard++ < 10000) {
     arr.shift();
   }
 }

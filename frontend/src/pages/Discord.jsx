@@ -168,7 +168,7 @@ export default function Discord({ state, api, feed }) {
     if (latest.type === 'discord-edit' && d.channelId === selectedChannel) {
       setMessages(prev => prev.map(m => m.id === d.messageId ? { ...m, content: d.content, editedTimestamp: d.editedTimestamp } : m))
     }
-  }, [feed?.length, selectedChannel])
+  }, [feed, selectedChannel])
 
   // ── Auto-scroll ──
   useEffect(() => {
