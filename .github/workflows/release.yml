@@ -20,6 +20,18 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Set version from tag
+        run: |
+          if [[ "${{ github.ref_name }}" == v* ]]; then
+            VERSION="${{ github.ref_name }}"
+          else
+            VERSION="v$(node -p 'require("./package.json").version')"
+          fi
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "VERSION_NUM=${VERSION#v}" >> $GITHUB_ENV
+          # Sync package.json version so electron-builder uses it in filenames
+          npm pkg set version="${VERSION#v}"
+
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libfuse2
 
@@ -55,6 +67,18 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Set version from tag
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" == v* ]]; then
+            VERSION="${{ github.ref_name }}"
+          else
+            VERSION="v$(node -p 'require("./package.json").version')"
+          fi
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "VERSION_NUM=${VERSION#v}" >> $GITHUB_ENV
+          npm pkg set version="${VERSION#v}"
+
       - name: Install backend dependencies
         run: npm ci
 
@@ -83,6 +107,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set version
+        run: |
+          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "VERSION_NUM=${{ github.ref_name }}" | sed 's/v/VERSION_NUM=/' >> $GITHUB_ENV
+
       - name: Download Linux builds
         uses: actions/download-artifact@v4
         with:
@@ -101,18 +130,19 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: Selfbot Dashboard ${{ env.VERSION }}
           files: dist/*
           generate_release_notes: false
           body: |
-            ## Selfbot Dashboard ${{ github.ref_name }}
+            ## Selfbot Dashboard ${{ env.VERSION }}
 
             ### Downloads
             | Platform | File | Description |
             |----------|------|-------------|
-            | Linux | `.AppImage` | Portable — download, chmod +x, run |
-            | Linux | `.deb` | Debian/Ubuntu installer |
-            | Windows | `-Setup.exe` | Windows installer |
-            | Windows | `-Portable.exe` | Windows portable — no install needed |
+            | Linux | `Selfbot-Dashboard-${{ env.VERSION_NUM }}.AppImage` | Portable — download, chmod +x, run |
+            | Linux | `selfbot-dashboard_${{ env.VERSION_NUM }}_amd64.deb` | Debian/Ubuntu installer |
+            | Windows | `Selfbot-Dashboard-Setup-${{ env.VERSION_NUM }}.exe` | Windows installer |
+            | Windows | `Selfbot-Dashboard-${{ env.VERSION_NUM }}-Portable.exe` | Windows portable — no install needed |
 
             ### What's included
             - **322 bot commands** — economy, gambling, AI, moderation, stealth, cloner
