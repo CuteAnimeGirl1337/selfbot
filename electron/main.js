@@ -1,4 +1,8 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, screen } = require('electron');
+
+// Suppress Wayland color management errors on Fedora/GNOME
+app.commandLine.appendSwitch('disable-features', 'WaylandColorManager');
+app.commandLine.appendSwitch('disable-gpu-sandbox');
 const path = require('path');
 const { fork } = require('child_process');
 const net = require('net');

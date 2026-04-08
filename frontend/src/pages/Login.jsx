@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { LogIn, Eye, EyeOff, AlertCircle, Loader } from 'lucide-react'
+import { LogIn, Eye, EyeOff, AlertCircle, Loader, Shield } from 'lucide-react'
 
 export default function Login({ onLogin }) {
   const [token, setToken] = useState('')
@@ -28,134 +28,198 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-bg-0 relative overflow-hidden">
-      {/* Ambient glow orbs */}
-      <div className="absolute w-[500px] h-[500px] rounded-full pointer-events-none top-[20%] left-[15%]" style={{ background: 'radial-gradient(circle, rgba(99,102,241,.05) 0%, transparent 65%)', filter: 'blur(40px)' }} />
-      <div className="absolute w-[400px] h-[400px] rounded-full pointer-events-none bottom-[10%] right-[20%]" style={{ background: 'radial-gradient(circle, rgba(124,58,237,.04) 0%, transparent 65%)', filter: 'blur(40px)' }} />
-      <div className="absolute w-[300px] h-[300px] rounded-full pointer-events-none top-[60%] left-[60%]" style={{ background: 'radial-gradient(circle, rgba(34,211,238,.03) 0%, transparent 65%)', filter: 'blur(40px)' }} />
+    <div style={s.root}>
+      {/* Background grid */}
+      <div style={s.gridBg} />
+      {/* Ambient orbs */}
+      <div style={s.orb1} />
+      <div style={s.orb2} />
 
       <motion.div
-        className="w-[400px] relative z-[1] border border-white/[0.04] rounded-[20px] px-9 py-10"
-        style={{
-          background: 'var(--bg-glass)',
-          backdropFilter: 'blur(40px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-          boxShadow: '0 24px 80px rgba(0,0,0,.4), 0 0 1px rgba(255,255,255,.05) inset',
-        }}
-        initial={{ opacity: 0, y: 24, scale: .97 }}
+        style={s.card}
+        initial={{ opacity: 0, y: 30, scale: .96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: .6, ease: [.22, 1, .36, 1] }}
+        transition={{ duration: .7, ease: [.22, 1, .36, 1] }}
       >
-        {/* Brand */}
+        {/* Icon */}
         <motion.div
-          className="flex items-center gap-2.5 mb-8"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: .15 }}
+          style={s.iconRow}
+          initial={{ opacity: 0, scale: .8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: .2, type: 'spring', stiffness: 300 }}
         >
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)', boxShadow: '0 4px 12px rgba(99,102,241,.25)' }}>
-            <div className="w-2.5 h-2.5 rounded-full bg-white/90" />
+          <div style={s.iconCircle}>
+            <Shield size={24} color="#fff" />
           </div>
-          <span className="text-[15px] font-bold text-t2 tracking-tight">Selfbot</span>
         </motion.div>
 
-        <motion.h1
-          className="text-[28px] font-bold tracking-tight text-t1 leading-none"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: .2 }}
-        >
-          Welcome back
+        <motion.h1 style={s.title} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .25 }}>
+          Selfbot Dashboard
         </motion.h1>
-        <motion.p
-          className="text-sm text-t3 mt-2 mb-8 leading-snug"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: .25 }}
-        >
-          Enter your Discord token to continue
+        <motion.p style={s.sub} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .3 }}>
+          Paste your Discord token to connect
         </motion.p>
 
         {/* Input */}
-        <motion.div
-          className="mb-5"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: .3 }}
-        >
-          <label className="block text-xs font-semibold text-t2 mb-2 tracking-wide">Token</label>
-          <div className={`flex items-center bg-bg-3 border rounded-[10px] overflow-hidden transition-[border-color,box-shadow] duration-200 ${error ? 'border-red/30 shadow-[0_0_0_3px_rgba(251,113,133,.08)]' : 'border-white/[0.04]'}`}>
+        <motion.div style={s.inputGroup} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .35 }}>
+          <div style={{
+            ...s.inputWrap,
+            borderColor: error ? 'rgba(251,113,133,.3)' : token ? 'rgba(99,102,241,.2)' : 'rgba(255,255,255,.06)',
+            boxShadow: error ? '0 0 0 3px rgba(251,113,133,.06)' : token ? '0 0 0 3px rgba(99,102,241,.06)' : 'none',
+          }}>
             <input
               type={show ? 'text' : 'password'}
               value={token}
-              onChange={e => { setToken(e.target.value); setError(''); }}
-              onKeyDown={e => { if (e.key === 'Enter') submit(); }}
-              placeholder="Paste your token here"
-              className="flex-1 px-3.5 py-[13px] bg-transparent border-none outline-none text-t1 text-sm font-mono tracking-wide"
+              onChange={e => { setToken(e.target.value); setError('') }}
+              onKeyDown={e => { if (e.key === 'Enter') submit() }}
+              placeholder="Discord token"
+              style={s.input}
               autoFocus
               spellCheck={false}
               autoComplete="off"
             />
-            <button className="bg-transparent border-none text-t4 px-3.5 py-3 cursor-pointer flex transition-colors duration-150" onClick={() => setShow(p => !p)} type="button" tabIndex={-1}>
-              {show ? <EyeOff size={15} /> : <Eye size={15} />}
+            <button style={s.eyeBtn} onClick={() => setShow(p => !p)} tabIndex={-1}>
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </motion.div>
 
         {/* Error */}
         {error && (
-          <motion.div
-            className="flex items-center gap-[7px] px-[13px] py-2.5 mb-4 border border-red/[0.12] rounded-[9px] text-red text-[13px] font-medium"
-            style={{ background: 'var(--red-soft)' }}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-          >
-            <AlertCircle size={13} />
-            <span>{error}</span>
+          <motion.div style={s.error} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}>
+            <AlertCircle size={14} /> {error}
           </motion.div>
         )}
 
         {/* Button */}
         <motion.button
-          className={`w-full py-[13px] border-none rounded-[10px] text-white text-[15px] font-semibold cursor-pointer flex items-center justify-center gap-2 transition-shadow duration-200 mb-6 ${loading ? 'opacity-60' : 'opacity-100'}`}
-          style={{
-            background: 'linear-gradient(135deg, var(--accent), #7c3aed)',
-            boxShadow: '0 4px 16px rgba(99,102,241,.2)',
-            fontFamily: 'var(--font)',
-          }}
+          style={{ ...s.btn, opacity: loading ? .6 : 1 }}
           onClick={submit}
           disabled={loading}
-          whileHover={{ scale: 1.01, boxShadow: '0 6px 24px rgba(99,102,241,.3)' }}
-          whileTap={{ scale: .98 }}
-          initial={{ opacity: 0, y: 8 }}
+          whileHover={!loading ? { scale: 1.015, boxShadow: '0 8px 32px rgba(99,102,241,.35)' } : {}}
+          whileTap={!loading ? { scale: .98 } : {}}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: .35 }}
+          transition={{ delay: .4 }}
         >
           {loading ? (
-            <><Loader size={15} style={{ animation: 'spin .8s linear infinite' }} /> Connecting...</>
+            <><Loader size={16} style={{ animation: 'spin .8s linear infinite' }} /> Connecting...</>
           ) : (
-            <><LogIn size={15} /> Continue</>
+            <><LogIn size={16} /> Connect</>
           )}
         </motion.button>
 
-        {/* Help */}
-        <motion.div
-          className="border-t border-white/[0.04] pt-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: .45 }}
-        >
-          <details className="cursor-pointer">
-            <summary className="text-xs font-semibold text-t3 list-none flex items-center gap-1.5">How to find your token</summary>
-            <ol className="text-xs text-t4 leading-8 pl-5 mt-2.5">
-              <li>Open Discord in your browser</li>
-              <li>Press <kbd className="bg-bg-4 px-[7px] py-px rounded-[5px] font-mono text-[11px] text-t2 border border-white/[0.04] font-medium">F12</kbd> → Network tab</li>
-              <li>Send any message, click a request to discord.com</li>
-              <li>Copy the <kbd className="bg-bg-4 px-[7px] py-px rounded-[5px] font-mono text-[11px] text-t2 border border-white/[0.04] font-medium">Authorization</kbd> header value</li>
-            </ol>
-          </details>
+        {/* Divider */}
+        <div style={s.divider}>
+          <div style={s.divLine} />
+          <span style={s.divText}>how to get your token</span>
+          <div style={s.divLine} />
+        </div>
+
+        {/* Steps */}
+        <motion.div style={s.steps} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .5 }}>
+          <div style={s.step}><span style={s.stepNum}>1</span> Open Discord in browser, press <kbd style={s.kbd}>F12</kbd></div>
+          <div style={s.step}><span style={s.stepNum}>2</span> Go to <kbd style={s.kbd}>Network</kbd> tab, send a message</div>
+          <div style={s.step}><span style={s.stepNum}>3</span> Click any request, copy <kbd style={s.kbd}>Authorization</kbd> header</div>
         </motion.div>
       </motion.div>
     </div>
   )
+}
+
+const s = {
+  root: {
+    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: '#050506', position: 'relative', overflow: 'hidden',
+  },
+  gridBg: {
+    position: 'absolute', inset: 0, pointerEvents: 'none',
+    backgroundImage: 'linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px)',
+    backgroundSize: '60px 60px',
+    maskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 20%, transparent 70%)',
+    WebkitMaskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 20%, transparent 70%)',
+  },
+  orb1: {
+    position: 'absolute', width: 500, height: 500, borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(99,102,241,.07) 0%, transparent 60%)',
+    top: '15%', left: '25%', pointerEvents: 'none', filter: 'blur(60px)',
+  },
+  orb2: {
+    position: 'absolute', width: 400, height: 400, borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(124,58,237,.05) 0%, transparent 60%)',
+    bottom: '15%', right: '25%', pointerEvents: 'none', filter: 'blur(60px)',
+  },
+
+  card: {
+    width: 380, position: 'relative', zIndex: 1,
+    background: 'rgba(12,12,15,.85)',
+    backdropFilter: 'blur(40px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+    border: '1px solid rgba(255,255,255,.06)',
+    borderRadius: 24, padding: '40px 36px 36px',
+    boxShadow: '0 32px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03)',
+    textAlign: 'center',
+  },
+
+  iconRow: { display: 'flex', justifyContent: 'center', marginBottom: 24 },
+  iconCircle: {
+    width: 56, height: 56, borderRadius: 16,
+    background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxShadow: '0 8px 24px rgba(99,102,241,.3)',
+  },
+
+  title: { fontSize: 22, fontWeight: 700, letterSpacing: '-.4px', color: '#f0f0f2', marginBottom: 6 },
+  sub: { fontSize: 14, color: '#5a5a65', marginBottom: 28, lineHeight: 1.4 },
+
+  inputGroup: { marginBottom: 16 },
+  inputWrap: {
+    display: 'flex', alignItems: 'center',
+    background: '#111114', border: '1px solid rgba(255,255,255,.06)',
+    borderRadius: 12, overflow: 'hidden', transition: 'border-color .2s, box-shadow .2s',
+  },
+  input: {
+    flex: 1, padding: '14px 16px', background: 'transparent', border: 'none', outline: 'none',
+    color: '#f0f0f2', fontSize: 15, fontFamily: 'var(--mono)', letterSpacing: '.3px',
+  },
+  eyeBtn: {
+    background: 'transparent', border: 'none', color: '#3a3a42', padding: '12px 14px',
+    cursor: 'pointer', display: 'flex', transition: 'color .15s',
+  },
+
+  error: {
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+    padding: '10px 14px', marginBottom: 16, borderRadius: 10,
+    background: 'rgba(251,113,133,.06)', border: '1px solid rgba(251,113,133,.1)',
+    color: '#fb7185', fontSize: 13, fontWeight: 500,
+  },
+
+  btn: {
+    width: '100%', padding: '14px 0', border: 'none', borderRadius: 12,
+    background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+    color: '#fff', fontSize: 15, fontWeight: 600,
+    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    boxShadow: '0 4px 20px rgba(99,102,241,.25)',
+    transition: 'box-shadow .2s', fontFamily: 'inherit',
+  },
+
+  divider: {
+    display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0 18px',
+  },
+  divLine: { flex: 1, height: 1, background: 'rgba(255,255,255,.04)' },
+  divText: { fontSize: 11, color: '#3a3a42', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', whiteSpace: 'nowrap' },
+
+  steps: { display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'left' },
+  step: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#5a5a65', lineHeight: 1.4 },
+  stepNum: {
+    width: 22, height: 22, borderRadius: 7, flexShrink: 0,
+    background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.12)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 11, fontWeight: 700, color: '#818cf8',
+  },
+  kbd: {
+    background: '#17171b', padding: '1px 7px', borderRadius: 5,
+    fontFamily: 'var(--mono)', fontSize: 11, color: '#94949e',
+    border: '1px solid rgba(255,255,255,.06)', fontWeight: 600,
+  },
 }
