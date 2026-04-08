@@ -1,6 +1,6 @@
 {
   "name": "selfbot-dashboard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "CuteAnimeGirl1337",
     "email": "noreply@users.noreply.github.com"
@@ -31,11 +31,17 @@
     "appId": "com.selfbot.dashboard",
     "productName": "Selfbot Dashboard",
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Utility"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": null
     },
     "nsis": {
@@ -51,6 +57,6 @@
       "package.json",
       ".env"
     ],
-"asar": true
+    "asar": true
   }
 }
