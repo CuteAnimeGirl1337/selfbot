@@ -18,18 +18,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libnotify-dev libnss3 libxss1 libasound2t64 libatk-bridge2.0-0
 
       - name: Install backend dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install frontend dependencies
-        run: cd frontend && npm install
+        run: cd frontend && npm ci
 
       - name: Build frontend
         run: cd frontend && npx vite build
 
       - name: Build Linux (AppImage + deb)
-        run: npx electron-builder --linux AppImage deb
+        run: npx electron-builder --linux AppImage deb --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,18 +55,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
       - name: Install backend dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install frontend dependencies
-        run: cd frontend && npm install
+        run: cd frontend && npm ci
 
       - name: Build frontend
         run: cd frontend && npx vite build
 
       - name: Build Windows (NSIS + Portable)
-        run: npx electron-builder --win nsis portable
+        run: npx electron-builder --win nsis portable --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -104,10 +111,10 @@ jobs:
             ### Downloads
             | Platform | File | Description |
             |----------|------|-------------|
-            | 🐧 Linux | `.AppImage` | Portable — download, chmod +x, run |
-            | 🐧 Linux | `.deb` | Debian/Ubuntu installer |
-            | 🪟 Windows | `-Setup.exe` | Windows installer |
-            | 🪟 Windows | `-Portable.exe` | Windows portable — no install needed |
+            | Linux | `.AppImage` | Portable — download, chmod +x, run |
+            | Linux | `.deb` | Debian/Ubuntu installer |
+            | Windows | `-Setup.exe` | Windows installer |
+            | Windows | `-Portable.exe` | Windows portable — no install needed |
 
             ### What's included
             - **322 bot commands** — economy, gambling, AI, moderation, stealth, cloner

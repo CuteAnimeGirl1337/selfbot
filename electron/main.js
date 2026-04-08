@@ -4,7 +4,7 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, screen } = 
 app.commandLine.appendSwitch('disable-features', 'WaylandColorManager');
 app.commandLine.appendSwitch('disable-gpu-sandbox');
 const path = require('path');
-const { fork } = require('child_process');
+const { spawn } = require('child_process');
 const net = require('net');
 
 let mainWindow = null;
@@ -48,10 +48,13 @@ function startServer() {
     await killPort(PORT);
 
     const serverPath = path.join(__dirname, '..', 'index.js');
-    serverProcess = fork(serverPath, [], {
+    // Use system node (not Electron's binary) so native modules work correctly
+    const nodeBin = IS_WIN ? 'node.exe' : 'node';
+    serverProcess = spawn(nodeBin, [serverPath], {
       cwd: path.join(__dirname, '..'),
       env: { ...process.env, ELECTRON: '1' },
-      silent: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell: false,
     });
 
     let resolved = false;
@@ -76,6 +79,7 @@ function startServer() {
 
     serverProcess.on('exit', (code) => {
       if (!isQuitting) console.log(`[server] Exited with code ${code}`);
+      if (!resolved) { resolved = true; resolve(); }
     });
 
     setTimeout(() => { if (!resolved) { resolved = true; resolve(); } }, 10000);
@@ -84,7 +88,12 @@ function startServer() {
 
 function stopServer() {
   if (serverProcess) {
-    serverProcess.kill(IS_WIN ? 'SIGKILL' : 'SIGTERM');
+    if (IS_WIN) {
+      // On Windows, spawn'd processes need taskkill for tree kill
+      require('child_process').exec(`taskkill /PID ${serverProcess.pid} /T /F`, () => {});
+    } else {
+      serverProcess.kill('SIGTERM');
+    }
     serverProcess = null;
   }
 }
@@ -196,6 +205,9 @@ app.whenReady().then(async () => {
   console.log('[electron] Creating window...');
   createWindow();
   createTray();
+}).catch(err => {
+  console.error('[electron] Fatal:', err);
+  app.quit();
 });
 
 app.on('window-all-closed', () => { /* tray keeps alive */ });
@@ -210,7 +222,7 @@ app.on('before-quit', () => {
   stopServer();
 });
 
-// Windows: single instance lock
+// Single instance lock — show existing window if another instance is running
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -223,3 +235,8 @@ if (!gotLock) {
     }
   });
 }
+
+// Release lock on quit so stale locks don't block future launches
+app.on('will-quit', () => {
+  app.releaseSingleInstanceLock();
+});
