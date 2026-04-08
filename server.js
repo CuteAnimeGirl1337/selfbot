@@ -89,6 +89,16 @@ function getFullState() {
             id: user.id,
             avatar: user.displayAvatarURL({ size: 128 }),
             status: user.presence?.status || 'offline',
+            activities: (user.presence?.activities || []).map(a => ({
+              name: a.name,
+              type: a.type, // PLAYING, STREAMING, LISTENING, WATCHING, CUSTOM, COMPETING
+              state: a.state,
+              details: a.details,
+              url: a.url,
+              timestamps: a.timestamps ? { start: a.timestamps.start?.getTime?.() || a.timestamps.start, end: a.timestamps.end?.getTime?.() || a.timestamps.end } : null,
+              assets: a.assets ? { largeImage: a.assets.largeImageURL?.() || a.assets.largeImage, largeText: a.assets.largeText, smallImage: a.assets.smallImageURL?.() || a.assets.smallImage, smallText: a.assets.smallText } : null,
+              emoji: a.emoji ? { name: a.emoji.name, id: a.emoji.id, url: a.emoji.url } : null,
+            })),
           }
         : null,
       stats: stats.getAll(),

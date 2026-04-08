@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   MessageSquare, Zap, Globe, Crosshair, Activity, Eye,
-  TrendingUp, Clock, ArrowRight, ChevronRight
+  TrendingUp, Clock, ArrowRight, ChevronRight,
+  Music, Gamepad2, MonitorPlay, Radio, Trophy, Headphones
 } from 'lucide-react'
 
 const fmt = n => {
@@ -29,6 +30,104 @@ const cards = [
   { key: 'msgRate', icon: Activity, color: '#22d3ee', label: 'Msg/min' },
   { key: 'spy', icon: Eye, color: '#f472b6', label: 'Spying' },
 ]
+
+const activityIcons = { PLAYING: Gamepad2, STREAMING: MonitorPlay, LISTENING: Headphones, WATCHING: Eye, COMPETING: Trophy, CUSTOM: Radio }
+
+function NowPlaying({ user }) {
+  const [elapsed, setElapsed] = useState(0)
+  const activity = user?.activities?.find(a => a.type !== 'CUSTOM' && a.name)
+  const customStatus = user?.activities?.find(a => a.type === 'CUSTOM')
+
+  useEffect(() => {
+    if (!activity?.timestamps?.start) return
+    const iv = setInterval(() => setElapsed(Date.now() - activity.timestamps.start), 1000)
+    return () => clearInterval(iv)
+  }, [activity?.timestamps?.start])
+
+  if (!activity && !customStatus) return null
+
+  const Icon = activityIcons[activity?.type] || Music
+  const elapsedStr = activity?.timestamps?.start
+    ? `${Math.floor(elapsed / 60000)}:${String(Math.floor(elapsed / 1000) % 60).padStart(2, '0')}`
+    : null
+
+  // Progress bar (if end timestamp exists)
+  const progress = activity?.timestamps?.start && activity?.timestamps?.end
+    ? Math.min(((Date.now() - activity.timestamps.start) / (activity.timestamps.end - activity.timestamps.start)) * 100, 100)
+    : null
+
+  const typeLabel = { PLAYING: 'Playing', STREAMING: 'Streaming', LISTENING: 'Listening to', WATCHING: 'Watching', COMPETING: 'Competing in' }
+
+  return (
+    <motion.div
+      style={np.card}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: .1 }}
+    >
+      {/* Album art / game image */}
+      {activity?.assets?.largeImage ? (
+        <img src={activity.assets.largeImage} alt="" style={np.art} />
+      ) : (
+        <div style={np.artFallback}><Icon size={24} /></div>
+      )}
+
+      <div style={np.info}>
+        <div style={np.typeRow}>
+          <Icon size={12} />
+          <span style={np.type}>{typeLabel[activity?.type] || 'Activity'}</span>
+          {elapsedStr && <span style={np.elapsed}>{elapsedStr}</span>}
+        </div>
+        <div style={np.name}>{activity?.name || customStatus?.state || ''}</div>
+        {activity?.details && <div style={np.details}>{activity.details}</div>}
+        {activity?.state && activity.type !== 'CUSTOM' && <div style={np.state}>{activity.state}</div>}
+
+        {/* Progress bar */}
+        {progress !== null && (
+          <div style={np.barBg}>
+            <motion.div
+              style={np.barFill}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: .5, ease: 'linear' }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Small image (e.g. Spotify logo) */}
+      {activity?.assets?.smallImage && (
+        <img src={activity.assets.smallImage} alt="" style={np.smallArt} />
+      )}
+    </motion.div>
+  )
+}
+
+const np = {
+  card: {
+    display: 'flex', alignItems: 'center', gap: 14,
+    padding: '14px 18px', marginBottom: 14,
+    background: 'linear-gradient(135deg, #0c0c18, #10101a)',
+    border: '1px solid rgba(99,102,241,.06)',
+    borderRadius: 14, position: 'relative', overflow: 'hidden',
+  },
+  art: { width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0, background: '#17171b' },
+  artFallback: {
+    width: 56, height: 56, borderRadius: 10, flexShrink: 0,
+    background: 'rgba(99,102,241,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#818cf8',
+  },
+  info: { flex: 1, minWidth: 0 },
+  typeRow: { display: 'flex', alignItems: 'center', gap: 6, color: '#5a5a65', marginBottom: 3 },
+  type: { fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px' },
+  elapsed: { fontSize: 11, fontFamily: 'var(--mono)', color: '#3a3a42', marginLeft: 'auto' },
+  name: { fontSize: 15, fontWeight: 600, color: '#f0f0f2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  details: { fontSize: 13, color: '#94949e', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  state: { fontSize: 12, color: '#5a5a65', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  barBg: { height: 3, background: '#1e1e23', borderRadius: 2, marginTop: 6, overflow: 'hidden' },
+  barFill: { height: '100%', background: 'linear-gradient(90deg, #6366f1, #818cf8)', borderRadius: 2 },
+  smallArt: { width: 24, height: 24, borderRadius: 6, objectFit: 'cover', position: 'absolute', bottom: 10, right: 14 },
+}
 
 export default function Overview({ state, logs }) {
   if (!state) return (
@@ -65,6 +164,9 @@ export default function Overview({ state, logs }) {
           </div>
         </div>
       </motion.div>
+
+      {/* Now Playing */}
+      <NowPlaying user={state.user} />
 
       {/* Stats grid */}
       <motion.div
