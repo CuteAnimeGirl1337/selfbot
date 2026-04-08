@@ -34,8 +34,6 @@
   </tr>
 </table>
 
-> **To add screenshots:** take them from the running dashboard and save as `screenshots/overview.png`, `screenshots/login.png`, etc.
-
 ---
 
 ## Features
@@ -95,6 +93,19 @@
 - **Keyboard shortcuts** (`Alt+1-9` to jump between pages)
 - **Desktop notifications** with sound alerts
 - Builds to `.AppImage` (Linux) and `.exe` (Windows)
+
+### Nitro Sniper
+
+Automatically detects and claims Discord Nitro gift links (`discord.gift/...`) in real-time across all servers and DMs.
+
+- **Instant detection** — scans every message for gift links the moment they're sent
+- **Auto-claim** — attempts to redeem the gift on your account within milliseconds
+- **Full logging** — every attempt is logged with status (claimed / already claimed / failed), who sent it, which channel, and timestamp
+- **Dashboard control** — toggle on/off from the dashboard or with `!nitrosniper` command
+- **Live notifications** — get a desktop notification + sound alert when a gift is detected
+- **History** — view all past claims and attempts from the Nitro section in the dashboard API
+
+> The sniper runs passively in the background. It doesn't spam or abuse any API — it simply reacts faster than humanly possible when a gift link appears.
 
 ### Under the Hood
 
