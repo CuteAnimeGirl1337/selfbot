@@ -1,6 +1,6 @@
 {
   "name": "selfbot-dashboard",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "CuteAnimeGirl1337",
     "email": "noreply@users.noreply.github.com"
@@ -55,8 +55,9 @@
       "plugins/**/*",
       "node_modules/**/*",
       "package.json",
+      "*.json",
       ".env"
     ],
-    "asar": true
+    "asar": false
   }
 }

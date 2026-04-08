@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { dataPath } = require('./datadir');
 
-const AUTH_FILE = path.join(__dirname, 'auth.json');
+const AUTH_FILE = dataPath('auth.json');
 let token = null;
 
 function loadOrCreateToken() {

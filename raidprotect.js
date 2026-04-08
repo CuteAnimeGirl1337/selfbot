@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { dataPath } = require('./datadir');
 
-const DATA_FILE = path.join(__dirname, 'raidprotect-data.json');
+const DATA_FILE = dataPath('raidprotect-data.json');
 
 const state = {
   enabled: false,

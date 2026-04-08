@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { dataPath } = require('./datadir');
 
-const DATA_FILE = path.join(__dirname, 'stealth-data.json');
+const DATA_FILE = dataPath('stealth-data.json');
 
 const state = {
   ghostRead: false,

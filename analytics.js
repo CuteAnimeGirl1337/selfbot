@@ -4,7 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const ANALYTICS_FILE = path.join(__dirname, 'analytics-data.json');
+const { dataPath } = require('./datadir');
+const ANALYTICS_FILE = dataPath('analytics-data.json');
 
 const COMMON_WORDS = new Set([
   'the','a','an','is','are','was','were','be','been','being','have','has','had',

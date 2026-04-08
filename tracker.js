@@ -4,7 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const TRACKER_FILE = path.join(__dirname, 'tracker-data.json');
+const { dataPath } = require('./datadir');
+const TRACKER_FILE = dataPath('tracker-data.json');
 
 const tracked = new Set();
 const history = new Map();    // userId → [{ type, old, new, timestamp }]

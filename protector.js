@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { dataPath } = require('./datadir');
 
-const DATA_FILE = path.join(__dirname, 'protector-data.json');
+const DATA_FILE = dataPath('protector-data.json');
 
 const SUSPICIOUS_PATTERNS = [
   /(?:discord\.gift|discordapp\.com\/gifts)\/[a-zA-Z0-9]+/i,

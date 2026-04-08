@@ -4,7 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const ALERTS_FILE = path.join(__dirname, 'alerts-data.json');
+const { dataPath } = require('./datadir');
+const ALERTS_FILE = dataPath('alerts-data.json');
 
 let keywords = [];
 let alertLog = [];

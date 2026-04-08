@@ -3,8 +3,9 @@
 // =============================================================================
 const fs = require('fs');
 const path = require('path');
+const { dataPath } = require('./datadir');
 
-const TOKEN_FILE = path.join(__dirname, 'token.json');
+const TOKEN_FILE = dataPath('token.json');
 
 // When user explicitly logs out, we set this flag so we don't auto-login from .env
 let loggedOut = false;

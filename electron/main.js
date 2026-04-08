@@ -4,18 +4,24 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, screen } = 
 app.commandLine.appendSwitch('disable-features', 'WaylandColorManager');
 app.commandLine.appendSwitch('disable-gpu-sandbox');
 const path = require('path');
-const { spawn } = require('child_process');
 const net = require('net');
 
 let mainWindow = null;
 let tray = null;
-let serverProcess = null;
 let isQuitting = false;
 
 const PORT = process.env.PORT || 3000;
 const SERVER_URL = `http://localhost:${PORT}`;
 const IS_WIN = process.platform === 'win32';
-const IS_MAC = process.platform === 'darwin';
+
+// ── Resolve app root (different in dev vs packaged) ──
+
+function getAppRoot() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'app');
+  }
+  return path.join(__dirname, '..');
+}
 
 // ── Kill anything on our port first ──
 
@@ -23,7 +29,6 @@ function killPort(port) {
   return new Promise((resolve) => {
     const s = net.createServer();
     s.once('error', () => {
-      // Port in use — try to free it
       if (IS_WIN) {
         require('child_process').exec(`netstat -ano | findstr :${port} | findstr LISTENING`, (err, out) => {
           if (out) {
@@ -47,55 +52,39 @@ function startServer() {
   return new Promise(async (resolve) => {
     await killPort(PORT);
 
-    const serverPath = path.join(__dirname, '..', 'index.js');
-    // Use system node (not Electron's binary) so native modules work correctly
-    const nodeBin = IS_WIN ? 'node.exe' : 'node';
-    serverProcess = spawn(nodeBin, [serverPath], {
-      cwd: path.join(__dirname, '..'),
-      env: { ...process.env, ELECTRON: '1' },
-      stdio: ['ignore', 'pipe', 'pipe'],
-      shell: false,
-    });
+    const appRoot = getAppRoot();
 
-    let resolved = false;
-
-    serverProcess.stdout.on('data', (data) => {
-      const msg = data.toString();
-      process.stdout.write(`[server] ${msg}`);
-      if (!resolved && msg.includes('Dashboard running')) {
-        resolved = true;
-        resolve();
-      }
-    });
-
-    serverProcess.stderr.on('data', (data) => {
-      process.stderr.write(`[server-err] ${data.toString()}`);
-    });
-
-    serverProcess.on('error', (err) => {
-      console.error('[server] Failed to start:', err.message);
-      if (!resolved) { resolved = true; resolve(); }
-    });
-
-    serverProcess.on('exit', (code) => {
-      if (!isQuitting) console.log(`[server] Exited with code ${code}`);
-      if (!resolved) { resolved = true; resolve(); }
-    });
-
-    setTimeout(() => { if (!resolved) { resolved = true; resolve(); } }, 10000);
-  });
-}
-
-function stopServer() {
-  if (serverProcess) {
-    if (IS_WIN) {
-      // On Windows, spawn'd processes need taskkill for tree kill
-      require('child_process').exec(`taskkill /PID ${serverProcess.pid} /T /F`, () => {});
-    } else {
-      serverProcess.kill('SIGTERM');
+    // Set data directory for packaged apps (writable location)
+    if (app.isPackaged) {
+      process.env.ELECTRON_DATA_DIR = app.getPath('userData');
     }
-    serverProcess = null;
-  }
+    process.env.ELECTRON = '1';
+    process.env.PORT = String(PORT);
+
+    // Run server in-process — works in both dev and packaged builds
+    // (spawn/fork fail in packaged apps: no system node, files inside asar)
+    try {
+      require(path.join(appRoot, 'index.js'));
+    } catch (err) {
+      console.error('[server] Failed to load:', err);
+      resolve();
+      return;
+    }
+
+    // Poll until server is actually listening
+    let resolved = false;
+    const check = setInterval(() => {
+      const req = require('http').get(SERVER_URL, () => {
+        if (!resolved) { resolved = true; clearInterval(check); resolve(); }
+      });
+      req.on('error', () => {}); // not ready yet
+      req.end();
+    }, 300);
+
+    setTimeout(() => {
+      if (!resolved) { resolved = true; clearInterval(check); resolve(); }
+    }, 10000);
+  });
 }
 
 // ── Window ──
@@ -118,7 +107,7 @@ function createWindow() {
     transparent: false,
     titleBarStyle: 'hidden',
     titleBarOverlay: false,
-    trafficLightPosition: { x: -100, y: -100 }, // hide macOS traffic lights
+    trafficLightPosition: { x: -100, y: -100 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -142,7 +131,6 @@ function createWindow() {
 
   mainWindow.on('closed', () => { mainWindow = null; });
 
-  // Send maximize state to renderer
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('window-state', 'maximized');
   });
@@ -159,15 +147,10 @@ function createWindow() {
 // ── Tray ──
 
 function createTray() {
-  // Generate a 16x16 indigo circle as PNG
-  const size = 16;
-  const icon = nativeImage.createEmpty();
-
-  // Use a simple built-in approach
   try {
     tray = new Tray(nativeImage.createEmpty());
   } catch {
-    return; // Tray not supported
+    return;
   }
 
   tray.setToolTip('Selfbot Dashboard');
@@ -219,10 +202,9 @@ app.on('activate', () => {
 
 app.on('before-quit', () => {
   isQuitting = true;
-  stopServer();
 });
 
-// Single instance lock — show existing window if another instance is running
+// Single instance lock
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -236,7 +218,6 @@ if (!gotLock) {
   });
 }
 
-// Release lock on quit so stale locks don't block future launches
 app.on('will-quit', () => {
   app.releaseSingleInstanceLock();
 });

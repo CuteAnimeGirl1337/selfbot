@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { dataPath } = require('./datadir');
 
-const DATA_FILE = path.join(__dirname, 'msglogger-data.json');
+const DATA_FILE = dataPath('msglogger-data.json');
 
 const MAX_MEMORY = 50000;
 const MAX_DISK = 10000;

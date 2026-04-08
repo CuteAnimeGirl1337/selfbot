@@ -4,7 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const ARCHIVE_FILE = path.join(__dirname, 'archive-data.json');
+const { dataPath } = require('./datadir');
+const ARCHIVE_FILE = dataPath('archive-data.json');
 
 const MAX_ARCHIVE = 5000;
 const MAX_CACHE_PER_CHANNEL = 1000;

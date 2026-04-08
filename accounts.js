@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const ACCOUNTS_FILE = path.join(__dirname, 'accounts.json');
+const { dataPath } = require('./datadir');
+const ACCOUNTS_FILE = dataPath('accounts.json');
 
 let accounts = []; // [{ name, token, addedAt }]
 
