@@ -52,6 +52,7 @@
     "files": [
       "electron/**/*",
       "public/**/*",
+      "src/**/*",
       "*.js",
       "plugins/**/*",
       "node_modules/**/*",
