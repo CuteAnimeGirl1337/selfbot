@@ -41,36 +41,37 @@
 
 ```
 selfbot/
-├── index.js              # Entry point — loads .env, starts server, Discord login
-├── bot.js                # Core bot — 331 commands, event handlers, command router (4.6K lines)
-├── server.js             # Express + WebSocket server — REST API, WS broadcast (1.5K lines)
-├── stats.js              # Economy singleton — players, XP, gambling log, leaderboard
-├── format.js             # Discord message formatter — progress bars, box drawing, cards
-├── token.js              # Token manager — login/logout, masked storage
-├── datadir.js            # Data directory resolver (Electron vs CLI)
+├── index.js                  # Entry point — loads .env, starts server, Discord login
 │
-├── # ── Optional Modules (lazy-loaded with try/catch) ──────────────
-├── persist.js            # Auto-save data.json every 60s + graceful shutdown
-├── auth.js               # Dashboard auth — random token, cookie/header/query param
-├── macros.js             # Named command sequences with configurable delay
-├── scheduler.js          # Timed messages — one-time + recurring (hourly/daily)
-├── automod.js            # Banned words, anti-spam rate limiting, anti-link filter
-├── plugins.js            # Hot-reloadable plugins from plugins/*.js
-├── nitro.js              # Auto-claim Discord Nitro gift links
-├── tracker.js            # User presence/status/avatar change monitoring
-├── alerts.js             # Keyword notifications — notify, reply, forward, react
-├── analytics.js          # Message stats — hourly/daily, per-server/channel, word freq
-├── archive.js            # Persistent deleted message vault with search
-├── accounts.js           # Multi-account token switching
-├── stealth.js            # Ghost read, invisible typing, delayed responses
-├── protector.js          # Token protection — phishing/IP logger/grabber detection
-├── evasion.js            # Selfbot detection evasion — random delays, rate limiting
-├── raidprotect.js        # Raid protection — ban/kick/delete thresholds per guild
-├── msglogger.js          # Message logging with search and per-guild stats
-├── cloner.js             # Server structure cloner — roles, channels, emojis
-├── webhookcloner.js      # Impersonate users via webhooks
+├── src/                      # ── Backend core ─────────────────────────────────
+│   ├── bot.js                # Core bot — 331 commands, event handlers, command router (4.6K lines)
+│   ├── server.js             # Express + WebSocket server — REST API, WS broadcast (1.5K lines)
+│   ├── stats.js              # Economy singleton — players, XP, gambling log, leaderboard
+│   ├── format.js             # Discord message formatter — progress bars, box drawing, cards
+│   ├── token.js              # Token manager — login/logout, masked storage
+│   ├── datadir.js            # Data directory resolver (Electron vs CLI)
+│   │
+│   └── modules/              # ── Optional modules (lazy-loaded with try/catch) ─
+│       ├── persist.js        # Auto-save data.json every 60s + graceful shutdown
+│       ├── auth.js           # Dashboard auth — random token, cookie/header/query param
+│       ├── macros.js         # Named command sequences with configurable delay
+│       ├── scheduler.js      # Timed messages — one-time + recurring (hourly/daily)
+│       ├── automod.js        # Banned words, anti-spam rate limiting, anti-link filter
+│       ├── plugins.js        # Hot-reloadable plugins from plugins/*.js
+│       ├── nitro.js          # Auto-claim Discord Nitro gift links
+│       ├── tracker.js        # User presence/status/avatar change monitoring
+│       ├── alerts.js         # Keyword notifications — notify, reply, forward, react
+│       ├── analytics.js      # Message stats — hourly/daily, per-server/channel, word freq
+│       ├── archive.js        # Persistent deleted message vault with search
+│       ├── accounts.js       # Multi-account token switching
+│       ├── stealth.js        # Ghost read, invisible typing, delayed responses
+│       ├── protector.js      # Token protection — phishing/IP logger/grabber detection
+│       ├── evasion.js        # Selfbot detection evasion — random delays, rate limiting
+│       ├── raidprotect.js    # Raid protection — ban/kick/delete thresholds per guild
+│       ├── msglogger.js      # Message logging with search and per-guild stats
+│       ├── cloner.js         # Server structure cloner — roles, channels, emojis
+│       └── webhookcloner.js  # Impersonate users via webhooks
 │
-├── # ── Frontend ───────────────────────────────────────────────────
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx                   # Router + page rendering
@@ -206,11 +207,11 @@ Auth token is printed to console on first run. Dashboard at `http://localhost:30
 ## Key Patterns
 
 - **Mutable shared config** — `config.prefix`, `config.afk`, `config.disabledCommands` (Set) are modified at runtime by both bot commands and the dashboard.
-- **Stats singleton** — `require('./stats')` is shared between bot.js and server.js. All economy, spy, auto-reply state lives here.
-- **Broadcast injection** — `setBroadcast(fn)` injects the WebSocket broadcast from server.js into bot.js. Bot events reach WS clients through this.
-- **Command router** — single large `messageCreate` listener with if/else chain. New commands go before the `help` command. Add to `commandList` array for dashboard visibility.
-- **Lazy module loading** — all optional modules loaded with try/catch in server.js. Bot works even if modules are missing or broken.
-- **Persistence** — `persist.js` saves to `data.json` every 60s and on SIGINT/SIGTERM. Each optional module also has its own `*-data.json` file.
+- **Stats singleton** — `require('./stats')` is shared between `src/bot.js` and `src/server.js`. All economy, spy, auto-reply state lives here.
+- **Broadcast injection** — `setBroadcast(fn)` injects the WebSocket broadcast from `src/server.js` into `src/bot.js`. Bot events reach WS clients through this.
+- **Command router** — single large `messageCreate` listener with if/else chain in `src/bot.js`. New commands go before the `help` command. Add to `commandList` array for dashboard visibility.
+- **Lazy module loading** — all optional modules in `src/modules/` are loaded with try/catch in `src/server.js`. Bot works even if modules are missing or broken.
+- **Persistence** — `src/modules/persist.js` saves to `data.json` every 60s and on SIGINT/SIGTERM. Each optional module also has its own `*-data.json` file.
 - **Plugins** — export `{ name, description, execute(message, args, client, stats) }`. Drop in `plugins/` and reload from dashboard.
 
 ## Data Files
@@ -231,7 +232,7 @@ Auth token is printed to console on first run. Dashboard at `http://localhost:30
 
 ## Adding a New Bot Command
 
-1. Add `['commandname', 'Description']` to `commandList` array in `bot.js` (~line 20-200)
+1. Add `['commandname', 'Description']` to `commandList` array in `src/bot.js` (~line 20-200)
 2. Add `else if (command === 'commandname') { ... }` handler before the help command
 3. Economy: `stats.getPlayer(userId, tag)` to get/create player, `stats.addXp(userId, amount)` for XP
 4. Gambling: use `stats.logGamble(...)` to record results
@@ -242,7 +243,7 @@ Auth token is printed to console on first run. Dashboard at `http://localhost:30
 1. Create `frontend/src/pages/PageName.jsx` — receives `{ state, api }` props from App.jsx
 2. Add import and route in `frontend/src/App.jsx`
 3. Add nav entry in `frontend/src/components/Sidebar.jsx` (import icon from lucide-react)
-4. Add API endpoints in `server.js` if needed (before SPA fallback)
+4. Add API endpoints in `src/server.js` if needed (before SPA fallback)
 5. Rebuild: `cd frontend && npx vite build`
 
 ## Environment

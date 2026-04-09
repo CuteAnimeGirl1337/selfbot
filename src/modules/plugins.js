@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const PLUGINS_DIR = path.join(__dirname, 'plugins');
+const PLUGINS_DIR = path.join(__dirname, '..', '..', 'plugins');
 const plugins = new Map();
 
 function ensurePluginsDir() {

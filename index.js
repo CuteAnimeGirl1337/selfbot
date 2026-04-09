@@ -3,9 +3,9 @@
 // =============================================================================
 require('dotenv').config();
 
-const { client } = require('./bot');
-const { startServer } = require('./server');
-const tokenMgr = require('./token');
+const { client } = require('./src/bot');
+const { startServer } = require('./src/server');
+const tokenMgr = require('./src/token');
 
 const PORT = process.env.PORT || 3000;
 

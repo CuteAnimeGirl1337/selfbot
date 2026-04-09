@@ -10,28 +10,28 @@ const { client, config, commandList, stats, setBroadcast, log } = require('./bot
 
 // Lazy-load optional modules (created by backend agent)
 let macrosMod, schedulerMod, automodMod, pluginsMod, nitroMod, authMod, persistMod;
-try { macrosMod = require('./macros'); } catch { macrosMod = null; }
-try { schedulerMod = require('./scheduler'); } catch { schedulerMod = null; }
-try { automodMod = require('./automod'); } catch { automodMod = null; }
-try { pluginsMod = require('./plugins'); } catch { pluginsMod = null; }
-try { nitroMod = require('./nitro'); } catch { nitroMod = null; }
-try { authMod = require('./auth'); } catch { authMod = null; }
-try { persistMod = require('./persist'); } catch { persistMod = null; }
+try { macrosMod = require('./modules/macros'); } catch { macrosMod = null; }
+try { schedulerMod = require('./modules/scheduler'); } catch { schedulerMod = null; }
+try { automodMod = require('./modules/automod'); } catch { automodMod = null; }
+try { pluginsMod = require('./modules/plugins'); } catch { pluginsMod = null; }
+try { nitroMod = require('./modules/nitro'); } catch { nitroMod = null; }
+try { authMod = require('./modules/auth'); } catch { authMod = null; }
+try { persistMod = require('./modules/persist'); } catch { persistMod = null; }
 let trackerMod, alertsMod, analyticsMod, archiveMod;
-try { trackerMod = require('./tracker'); } catch { trackerMod = null; }
-try { alertsMod = require('./alerts'); } catch { alertsMod = null; }
-try { analyticsMod = require('./analytics'); } catch { analyticsMod = null; }
-try { archiveMod = require('./archive'); } catch { archiveMod = null; }
+try { trackerMod = require('./modules/tracker'); } catch { trackerMod = null; }
+try { alertsMod = require('./modules/alerts'); } catch { alertsMod = null; }
+try { analyticsMod = require('./modules/analytics'); } catch { analyticsMod = null; }
+try { archiveMod = require('./modules/archive'); } catch { archiveMod = null; }
 const tokenMgr = require('./token');
 let accountsMod;
-try { accountsMod = require('./accounts'); } catch { accountsMod = null; }
-let stealthMod; try { stealthMod = require('./stealth'); } catch { stealthMod = null; }
-let protectorMod; try { protectorMod = require('./protector'); } catch { protectorMod = null; }
-let evasionMod; try { evasionMod = require('./evasion'); } catch { evasionMod = null; }
-let raidprotectMod; try { raidprotectMod = require('./raidprotect'); } catch { raidprotectMod = null; }
-let msgloggerMod; try { msgloggerMod = require('./msglogger'); } catch { msgloggerMod = null; }
-let clonerMod; try { clonerMod = require('./cloner'); } catch { clonerMod = null; }
-let webhookclonerMod; try { webhookclonerMod = require('./webhookcloner'); } catch { webhookclonerMod = null; }
+try { accountsMod = require('./modules/accounts'); } catch { accountsMod = null; }
+let stealthMod; try { stealthMod = require('./modules/stealth'); } catch { stealthMod = null; }
+let protectorMod; try { protectorMod = require('./modules/protector'); } catch { protectorMod = null; }
+let evasionMod; try { evasionMod = require('./modules/evasion'); } catch { evasionMod = null; }
+let raidprotectMod; try { raidprotectMod = require('./modules/raidprotect'); } catch { raidprotectMod = null; }
+let msgloggerMod; try { msgloggerMod = require('./modules/msglogger'); } catch { msgloggerMod = null; }
+let clonerMod; try { clonerMod = require('./modules/cloner'); } catch { clonerMod = null; }
+let webhookclonerMod; try { webhookclonerMod = require('./modules/webhookcloner'); } catch { webhookclonerMod = null; }
 
 const app = express();
 const server = http.createServer(app);
@@ -49,7 +49,7 @@ if (authMod) {
   });
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // =============================================================================
 // WebSocket — Live updates

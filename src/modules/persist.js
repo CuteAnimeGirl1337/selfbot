@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { dataPath } = require('./datadir');
+const { dataPath } = require('../datadir');
 const DATA_FILE = dataPath('data.json');
 
 let autoSaveTimer = null;

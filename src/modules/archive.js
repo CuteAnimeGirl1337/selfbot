@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { dataPath } = require('./datadir');
+const { dataPath } = require('../datadir');
 const ARCHIVE_FILE = dataPath('archive-data.json');
 
 const MAX_ARCHIVE = 5000;

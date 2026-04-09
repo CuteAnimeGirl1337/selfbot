@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { dataPath } = require('./datadir');
+const { dataPath } = require('../datadir');
 const ANALYTICS_FILE = dataPath('analytics-data.json');
 
 const COMMON_WORDS = new Set([

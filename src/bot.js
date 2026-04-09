@@ -888,14 +888,14 @@ client.on('messageCreate', async (message) => {
 
   // Nitro sniper (runs for all messages)
   try {
-    const nitroMod = require('./nitro');
+    const nitroMod = require('./modules/nitro');
     nitroMod.checkMessage(message, client, broadcast, log);
   } catch {}
 
   // AutoMod (runs for other users' messages in guilds)
   if (message.author.id !== client.user.id && message.guild) {
     try {
-      const automodMod = require('./automod');
+      const automodMod = require('./modules/automod');
       const result = automodMod.checkMessage(message, client);
       if (result && result.action === 'delete') {
         await message.delete().catch(() => null);
@@ -2783,7 +2783,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'macro') {
     try {
-      const macrosMod = require('./macros');
+      const macrosMod = require('./modules/macros');
       const sub = args[0];
       if (sub === 'add') {
         const name = args[1];
@@ -2822,7 +2822,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'schedule') {
     try {
-      const schedulerMod = require('./scheduler');
+      const schedulerMod = require('./modules/scheduler');
       const sub = args[0];
       if (sub === 'add') {
         const secs = parseInt(args[1], 10);
@@ -2846,7 +2846,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'automod') {
     try {
-      const automodMod = require('./automod');
+      const automodMod = require('./modules/automod');
       const sub = args[0];
       if (sub === 'addword') {
         const word = args.slice(1).join(' ');
@@ -2875,7 +2875,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'nitrosniper') {
     try {
-      const nitroMod = require('./nitro');
+      const nitroMod = require('./modules/nitro');
       nitroMod.setEnabled(!nitroMod.isEnabled());
       await message.reply(`Nitro sniper: **${nitroMod.isEnabled() ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Nitro module not available.'); }
@@ -4438,7 +4438,7 @@ client.on('messageCreate', async (message) => {
   // ========== STEALTH ==========
   else if (command === 'ghost') {
     try {
-      const stealth = require('./stealth');
+      const stealth = require('./modules/stealth');
       stealth.setState('ghostRead', !stealth.getState().ghostRead);
       await message.reply(`Ghost read: **${stealth.getState().ghostRead ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Stealth module not available.'); }
@@ -4446,7 +4446,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'invistype') {
     try {
-      const stealth = require('./stealth');
+      const stealth = require('./modules/stealth');
       stealth.setState('invisibleTyping', !stealth.getState().invisibleTyping);
       await message.reply(`Invisible typing: **${stealth.getState().invisibleTyping ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Stealth module not available.'); }
@@ -4454,7 +4454,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'humanmode') {
     try {
-      const stealth = require('./stealth');
+      const stealth = require('./modules/stealth');
       stealth.setState('delayedResponses', !stealth.getState().delayedResponses);
       await message.reply(`Human mode: **${stealth.getState().delayedResponses ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Stealth module not available.'); }
@@ -4462,7 +4462,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'stealthstatus') {
     try {
-      const stealth = require('./stealth');
+      const stealth = require('./modules/stealth');
       const s = stealth.getState();
       await message.reply(`**Stealth Status:**\nGhost Read: ${s.ghostRead ? '\u2705' : '\u274c'}\nInvisible Typing: ${s.invisibleTyping ? '\u2705' : '\u274c'}\nHuman Mode: ${s.delayedResponses ? '\u2705' : '\u274c'}`);
     } catch { await message.reply('Stealth module not available.'); }
@@ -4471,7 +4471,7 @@ client.on('messageCreate', async (message) => {
   // ========== RAID PROTECTION ==========
   else if (command === 'raidprotect') {
     try {
-      const rp = require('./raidprotect');
+      const rp = require('./modules/raidprotect');
       if (!message.guild) return message.reply('Server only.');
       if (rp.isProtected(message.guild.id)) { rp.disable(message.guild.id); await message.reply('Raid protection **disabled**.'); }
       else { rp.enable(message.guild.id); await message.reply('Raid protection **enabled** for this server.'); }
@@ -4480,7 +4480,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'protectstatus') {
     try {
-      const rp = require('./raidprotect');
+      const rp = require('./modules/raidprotect');
       if (!message.guild) return message.reply('Server only.');
       const protected_ = rp.isProtected(message.guild.id);
       const events = rp.getEventLog(message.guild.id, 5);
@@ -4493,7 +4493,7 @@ client.on('messageCreate', async (message) => {
   // ========== TOKEN PROTECTOR ==========
   else if (command === 'tokenprotect') {
     try {
-      const p = require('./protector');
+      const p = require('./modules/protector');
       p.setState('enabled', !p.getState().enabled);
       await message.reply(`Token protection: **${p.getState().enabled ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Module not available.'); }
@@ -4501,7 +4501,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'protectorstatus') {
     try {
-      const p = require('./protector');
+      const p = require('./modules/protector');
       const s = p.getState();
       const alerts = p.getAlerts().slice(0, 5);
       let reply = `**Token Protector:** ${s.enabled ? '\u2705 ON' : '\u274c OFF'}\nAuto-block: ${s.autoBlock ? 'ON' : 'OFF'}\nAlerts: ${p.getAlerts().length}`;
@@ -4513,7 +4513,7 @@ client.on('messageCreate', async (message) => {
   // ========== EVASION ==========
   else if (command === 'evasion') {
     try {
-      const ev = require('./evasion');
+      const ev = require('./modules/evasion');
       ev.setState('enabled', !ev.getState().enabled);
       await message.reply(`Evasion mode: **${ev.getState().enabled ? 'ON' : 'OFF'}**`);
     } catch { await message.reply('Module not available.'); }
@@ -4521,7 +4521,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'evasionstatus') {
     try {
-      const ev = require('./evasion');
+      const ev = require('./modules/evasion');
       const s = ev.getState();
       const stats = ev.getStats();
       await message.reply(`**Evasion Status:**\nEnabled: ${s.enabled ? '\u2705' : '\u274c'}\nRate limit: ${s.maxCommandsPerMinute}/min\nCommands (last min): ${stats.commandsLastMinute}\nThrottled: ${stats.isThrottled ? '\u26a0\ufe0f YES' : 'No'}`);
@@ -4531,7 +4531,7 @@ client.on('messageCreate', async (message) => {
   // ========== MESSAGE LOGGER ==========
   else if (command === 'logserver') {
     try {
-      const ml = require('./msglogger');
+      const ml = require('./modules/msglogger');
       if (!message.guild) return message.reply('Server only.');
       if (ml.isLogging(message.guild.id)) { ml.disableGuild(message.guild.id); await message.reply('Logging **disabled** for this server.'); }
       else { ml.enableGuild(message.guild.id); await message.reply('Logging **enabled** for this server.'); }
@@ -4540,7 +4540,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'logchannel') {
     try {
-      const ml = require('./msglogger');
+      const ml = require('./modules/msglogger');
       const ch = message.mentions.channels.first() || message.channel;
       ml.enableChannel(ch.id);
       await message.reply(`Logging **enabled** for #${ch.name}.`);
@@ -4549,7 +4549,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'logsearch') {
     try {
-      const ml = require('./msglogger');
+      const ml = require('./modules/msglogger');
       const query = args.join(' ');
       if (!query) return message.reply('Usage: `logsearch <text>`');
       const results = ml.search(query, { limit: 10 });
@@ -4561,7 +4561,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'logstats') {
     try {
-      const ml = require('./msglogger');
+      const ml = require('./modules/msglogger');
       const stats = ml.getStats();
       await message.reply(`**Message Logger:**\nTotal logged: ${stats.totalLogged.toLocaleString()}\nGuilds: ${Object.keys(stats.byGuild).length}\nEnabled: ${ml.getState().enabled ? '\u2705' : '\u274c'}`);
     } catch { await message.reply('Module not available.'); }
@@ -4570,7 +4570,7 @@ client.on('messageCreate', async (message) => {
   // ========== SERVER CLONER ==========
   else if (command === 'cloneserver') {
     try {
-      const cloner = require('./cloner');
+      const cloner = require('./modules/cloner');
       const targetId = args[0];
       if (!message.guild || !targetId) return message.reply('Usage: `cloneserver <target server ID>`');
       const target = client.guilds.cache.get(targetId);
@@ -4583,7 +4583,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'exportserver') {
     try {
-      const cloner = require('./cloner');
+      const cloner = require('./modules/cloner');
       if (!message.guild) return message.reply('Server only.');
       const data = await cloner.exportServer(message.guild);
       await message.reply(`\ud83d\udce6 Server exported: ${data.roles.length} roles, ${data.channels.length} channels, ${data.emojis.length} emojis`);
@@ -4593,7 +4593,7 @@ client.on('messageCreate', async (message) => {
   // ========== WEBHOOK CLONER ==========
   else if (command === 'sendas') {
     try {
-      const wc = require('./webhookcloner');
+      const wc = require('./modules/webhookcloner');
       const user = message.mentions.users.first();
       if (!user) return message.reply('Usage: `sendas @user <message>`');
       const text = args.slice(1).join(' ');
@@ -4605,7 +4605,7 @@ client.on('messageCreate', async (message) => {
 
   else if (command === 'impersonate') {
     try {
-      const wc = require('./webhookcloner');
+      const wc = require('./modules/webhookcloner');
       const user = message.mentions.users.first();
       const count = parseInt(args[1]) || 1;
       if (!user) return message.reply('Usage: `impersonate @user <count>`');
