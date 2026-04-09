@@ -8,6 +8,7 @@ const THEMES = {
     '--accent': '#6366f1', '--accent-h': '#818cf8',
     '--green': '#22c55e', '--red': '#ef4444', '--amber': '#f59e0b',
     '--purple': '#a78bfa', '--cyan': '#22d3ee',
+    '--glow': 'rgba(99,102,241,.12)', '--accent-soft': 'rgba(99,102,241,.08)',
   },
   ocean: {
     name: 'Ocean',
@@ -16,6 +17,7 @@ const THEMES = {
     '--accent': '#0ea5e9', '--accent-h': '#38bdf8',
     '--green': '#10b981', '--red': '#f43f5e', '--amber': '#f59e0b',
     '--purple': '#8b5cf6', '--cyan': '#06b6d4',
+    '--glow': 'rgba(14,165,233,.12)', '--accent-soft': 'rgba(14,165,233,.08)',
   },
   rose: {
     name: 'Rose',
@@ -24,6 +26,7 @@ const THEMES = {
     '--accent': '#f43f5e', '--accent-h': '#fb7185',
     '--green': '#34d399', '--red': '#ef4444', '--amber': '#fbbf24',
     '--purple': '#c084fc', '--cyan': '#22d3ee',
+    '--glow': 'rgba(244,63,94,.12)', '--accent-soft': 'rgba(244,63,94,.08)',
   },
   emerald: {
     name: 'Emerald',
@@ -32,6 +35,7 @@ const THEMES = {
     '--accent': '#10b981', '--accent-h': '#34d399',
     '--green': '#22c55e', '--red': '#ef4444', '--amber': '#f59e0b',
     '--purple': '#a78bfa', '--cyan': '#06b6d4',
+    '--glow': 'rgba(16,185,129,.12)', '--accent-soft': 'rgba(16,185,129,.08)',
   },
   sunset: {
     name: 'Sunset',
@@ -40,6 +44,7 @@ const THEMES = {
     '--accent': '#f97316', '--accent-h': '#fb923c',
     '--green': '#22c55e', '--red': '#ef4444', '--amber': '#eab308',
     '--purple': '#d946ef', '--cyan': '#06b6d4',
+    '--glow': 'rgba(249,115,22,.12)', '--accent-soft': 'rgba(249,115,22,.08)',
   },
   amoled: {
     name: 'AMOLED',
@@ -48,6 +53,7 @@ const THEMES = {
     '--accent': '#6366f1', '--accent-h': '#818cf8',
     '--green': '#22c55e', '--red': '#ef4444', '--amber': '#f59e0b',
     '--purple': '#a78bfa', '--cyan': '#22d3ee',
+    '--glow': 'rgba(99,102,241,.12)', '--accent-soft': 'rgba(99,102,241,.08)',
   },
 }
 

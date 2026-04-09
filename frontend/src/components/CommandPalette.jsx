@@ -1,57 +1,49 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Search, LayoutDashboard, MessageCircle, Radio, Zap, Dices,
-  UserSearch, Bell, BarChart3, Trash2, Repeat, CalendarClock,
+  Search, LayoutDashboard, MessageCircle, Radio, Terminal, Zap, Dices,
+  Repeat, CalendarClock, UserSearch, Bell, BarChart3, Trash2,
   Eye, Radar, Shield, Send, Hash, Webhook, Globe, Puzzle,
-  Database, User, Settings, Terminal
+  Database, User, Settings
 } from 'lucide-react'
 
-const iconMap = {
-  LayoutDashboard, MessageCircle, Radio, Zap, Dices, UserSearch,
-  Bell, BarChart3, Trash2, Repeat, CalendarClock, Eye, Radar,
-  Shield, Send, Hash, Webhook, Globe, Puzzle, Database, User,
-  Settings, Terminal, Search
-}
-
-const pages = [
-  { id: 'overview', label: 'Overview', icon: 'LayoutDashboard', keys: 'overview dashboard home' },
-  { id: 'discord', label: 'Discord', icon: 'MessageCircle', keys: 'discord chat messages dm' },
-  { id: 'live', label: 'Live Feed', icon: 'Radio', keys: 'live feed events' },
-  { id: 'commands', label: 'Commands', icon: 'Zap', keys: 'commands bot' },
-  { id: 'gambling', label: 'Gambling', icon: 'Dices', keys: 'gambling casino economy' },
-  { id: 'tracker', label: 'Tracker', icon: 'UserSearch', keys: 'tracker users online' },
-  { id: 'alerts', label: 'Alerts', icon: 'Bell', keys: 'alerts keywords notify' },
-  { id: 'analytics', label: 'Analytics', icon: 'BarChart3', keys: 'analytics stats charts' },
-  { id: 'archive', label: 'Archive', icon: 'Trash2', keys: 'archive deleted messages' },
-  { id: 'macros', label: 'Macros', icon: 'Repeat', keys: 'macros automation' },
-  { id: 'scheduler', label: 'Scheduler', icon: 'CalendarClock', keys: 'scheduler schedule messages' },
-  { id: 'logger', label: 'Logger', icon: 'Eye', keys: 'logger snipe deleted edited' },
-  { id: 'spy', label: 'Spy & Auto', icon: 'Radar', keys: 'spy autoreply' },
-  { id: 'automod', label: 'AutoMod', icon: 'Shield', keys: 'automod moderation' },
-  { id: 'dms', label: 'DMs', icon: 'Send', keys: 'dm direct messages' },
-  { id: 'channels', label: 'Channels', icon: 'Hash', keys: 'channels server' },
-  { id: 'webhooks', label: 'Webhooks', icon: 'Webhook', keys: 'webhooks' },
-  { id: 'servers', label: 'Servers', icon: 'Globe', keys: 'servers guilds' },
-  { id: 'plugins', label: 'Plugins', icon: 'Puzzle', keys: 'plugins extensions' },
-  { id: 'backup', label: 'Backup', icon: 'Database', keys: 'backup export import' },
-  { id: 'account', label: 'Account', icon: 'User', keys: 'account profile' },
-  { id: 'settings', label: 'Settings', icon: 'Settings', keys: 'settings config' },
-  { id: 'console', label: 'Console', icon: 'Terminal', keys: 'console logs terminal' },
+const PAGES = [
+  { id: 'overview',   label: 'Dashboard',     icon: LayoutDashboard, category: 'Navigation' },
+  { id: 'discord',    label: 'Discord',        icon: MessageCircle,   category: 'Navigation' },
+  { id: 'live',       label: 'Live Feed',      icon: Radio,           category: 'Navigation' },
+  { id: 'terminal',   label: 'Run Commands',   icon: Terminal,        category: 'Bot' },
+  { id: 'commands',   label: 'Commands',        icon: Zap,             category: 'Bot' },
+  { id: 'gambling',   label: 'Gambling',        icon: Dices,           category: 'Bot' },
+  { id: 'macros',     label: 'Macros',          icon: Repeat,          category: 'Bot' },
+  { id: 'scheduler',  label: 'Scheduler',       icon: CalendarClock,   category: 'Bot' },
+  { id: 'tracker',    label: 'Tracker',         icon: UserSearch,      category: 'Intelligence' },
+  { id: 'alerts',     label: 'Alerts',          icon: Bell,            category: 'Intelligence' },
+  { id: 'analytics',  label: 'Analytics',       icon: BarChart3,       category: 'Intelligence' },
+  { id: 'archive',    label: 'Archive',         icon: Trash2,          category: 'Intelligence' },
+  { id: 'logger',     label: 'Logger',          icon: Eye,             category: 'Intelligence' },
+  { id: 'spy',        label: 'Spy & Auto',      icon: Radar,           category: 'Intelligence' },
+  { id: 'automod',    label: 'AutoMod',         icon: Shield,          category: 'Tools' },
+  { id: 'dms',        label: 'DMs',             icon: Send,            category: 'Tools' },
+  { id: 'channels',   label: 'Channels',        icon: Hash,            category: 'Tools' },
+  { id: 'webhooks',   label: 'Webhooks',        icon: Webhook,         category: 'Tools' },
+  { id: 'servers',    label: 'Servers',          icon: Globe,           category: 'Tools' },
+  { id: 'plugins',    label: 'Plugins',          icon: Puzzle,          category: 'System' },
+  { id: 'backup',     label: 'Backup',           icon: Database,        category: 'System' },
+  { id: 'account',    label: 'Account',          icon: User,            category: 'System' },
+  { id: 'settings',   label: 'Settings',         icon: Settings,        category: 'System' },
+  { id: 'console',    label: 'Console',          icon: Terminal,        category: 'System' },
 ]
 
-export default function CommandPalette({ open, onClose, onNavigate, state }) {
+export default function CommandPalette({ isOpen, onClose, onNavigate }) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
   const inputRef = useRef(null)
   const listRef = useRef(null)
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return pages
+    if (!query.trim()) return PAGES
     const q = query.toLowerCase()
-    return pages.filter(p =>
-      p.label.toLowerCase().includes(q) || p.keys.toLowerCase().includes(q)
-    )
+    return PAGES.filter(p => p.label.toLowerCase().includes(q))
   }, [query])
 
   useEffect(() => {
@@ -59,14 +51,31 @@ export default function CommandPalette({ open, onClose, onNavigate, state }) {
   }, [query])
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       setQuery('')
       setSelected(0)
       setTimeout(() => inputRef.current?.focus(), 50)
     }
-  }, [open])
+  }, [isOpen])
 
-  // scroll selected item into view
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        if (isOpen) {
+          onClose()
+        } else {
+          // parent should handle opening, but we call onClose to toggle
+          // This is handled externally via isOpen prop
+        }
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [isOpen, onClose])
+
+  // Scroll selected item into view
   useEffect(() => {
     if (!listRef.current) return
     const item = listRef.current.children[selected]
@@ -81,10 +90,10 @@ export default function CommandPalette({ open, onClose, onNavigate, state }) {
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelected(s => Math.max(0, Math.min(s + 1, filtered.length - 1)))
+      setSelected(s => Math.min(s + 1, filtered.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelected(s => Math.max(0, Math.min(s - 1, filtered.length - 1)))
+      setSelected(s => Math.max(s - 1, 0))
     } else if (e.key === 'Enter' && filtered[selected]) {
       e.preventDefault()
       handleSelect(filtered[selected])
@@ -96,7 +105,7 @@ export default function CommandPalette({ open, onClose, onNavigate, state }) {
 
   return (
     <AnimatePresence>
-      {open && (
+      {isOpen && (
         <motion.div
           style={styles.overlay}
           initial={{ opacity: 0 }}
@@ -107,73 +116,83 @@ export default function CommandPalette({ open, onClose, onNavigate, state }) {
         >
           <motion.div
             style={styles.panel}
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            initial={{ opacity: 0, scale: 0.96, y: -16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            exit={{ opacity: 0, scale: 0.96, y: -16 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             onClick={e => e.stopPropagation()}
           >
+            {/* Search input */}
             <div style={styles.inputWrap}>
-              <Search size={16} style={styles.searchIcon} />
+              <Search size={20} style={{ color: 'var(--t3)', flexShrink: 0 }} />
               <input
                 ref={inputRef}
                 style={styles.input}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search or jump to..."
+                placeholder="Search pages..."
                 spellCheck={false}
+                autoComplete="off"
               />
             </div>
 
             <div style={styles.divider} />
 
+            {/* Results */}
             <div style={styles.results} ref={listRef}>
               {filtered.length === 0 && (
-                <div style={styles.empty}>No results found</div>
-              )}
-              {filtered.length > 0 && (
-                <div style={styles.groupLabel}>Pages</div>
+                <div style={styles.empty}>No results</div>
               )}
               {filtered.map((item, i) => {
-                const Icon = iconMap[item.icon]
-                const isSelected = i === selected
+                const Icon = item.icon
+                const isSel = i === selected
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
                     style={{
                       ...styles.item,
-                      background: isSelected ? 'var(--accent)' : 'transparent',
-                      color: isSelected ? '#fff' : 'var(--t2)',
+                      background: isSel ? 'var(--accent-soft, rgba(99,102,241,0.15))' : 'transparent',
                     }}
                     onClick={() => handleSelect(item)}
                     onMouseEnter={() => setSelected(i)}
-                    layout
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.1, delay: i * 0.01 }}
                   >
                     <div style={styles.itemLeft}>
-                      {Icon && <Icon size={15} style={{ opacity: isSelected ? 1 : 0.6, flexShrink: 0 }} />}
-                      <span style={styles.itemLabel}>{item.label}</span>
+                      <Icon
+                        size={16}
+                        style={{
+                          color: isSel ? 'var(--accent)' : 'var(--t3)',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span style={{
+                        ...styles.itemLabel,
+                        color: isSel ? 'var(--t1)' : 'var(--t2)',
+                      }}>
+                        {item.label}
+                      </span>
                     </div>
-                    <span style={{
-                      ...styles.shortcut,
-                      color: isSelected ? 'rgba(255,255,255,0.6)' : 'var(--t4)',
-                    }}>
-                      {item.id}
-                    </span>
-                  </motion.div>
+                    <span style={styles.categoryTag}>{item.category}</span>
+                  </div>
                 )
               })}
             </div>
 
             <div style={styles.divider} />
 
+            {/* Footer hints */}
             <div style={styles.footer}>
-              <span style={styles.hint}><kbd style={styles.kbd}>↑↓</kbd> Navigate</span>
-              <span style={styles.hint}><kbd style={styles.kbd}>↵</kbd> Open</span>
-              <span style={styles.hint}><kbd style={styles.kbd}>esc</kbd> Close</span>
+              <span style={styles.hint}>
+                <kbd style={styles.kbd}>&uarr;&darr;</kbd> Navigate
+              </span>
+              <span style={styles.hintDot}>&middot;</span>
+              <span style={styles.hint}>
+                <kbd style={styles.kbd}>&crarr;</kbd> Select
+              </span>
+              <span style={styles.hintDot}>&middot;</span>
+              <span style={styles.hint}>
+                <kbd style={styles.kbd}>esc</kbd> Close
+              </span>
             </div>
           </motion.div>
         </motion.div>
@@ -187,32 +206,30 @@ const styles = {
     position: 'fixed',
     inset: 0,
     zIndex: 9999,
-    background: 'rgba(0,0,0,0.6)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
+    background: 'rgba(0,0,0,0.55)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'center',
     paddingTop: 120,
   },
   panel: {
-    width: 500,
+    width: 560,
     maxWidth: 'calc(100vw - 32px)',
     background: 'var(--bg-1)',
-    border: '1px solid var(--border-h)',
-    borderRadius: 14,
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid var(--bg-3)',
+    borderRadius: 16,
     overflow: 'hidden',
     boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
   },
   inputWrap: {
     display: 'flex',
     alignItems: 'center',
-    padding: '14px 16px',
-    gap: 10,
-  },
-  searchIcon: {
-    color: 'var(--t3)',
-    flexShrink: 0,
+    padding: '16px 18px',
+    gap: 12,
   },
   input: {
     flex: 1,
@@ -220,33 +237,25 @@ const styles = {
     border: 'none',
     outline: 'none',
     color: 'var(--t1)',
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: 'var(--font)',
     letterSpacing: '-0.01em',
   },
   divider: {
     height: 1,
-    background: 'var(--border)',
+    background: 'var(--bg-3)',
   },
   results: {
     maxHeight: 400,
     overflowY: 'auto',
-    padding: '6px 6px',
-  },
-  groupLabel: {
-    fontSize: 10,
-    fontWeight: 600,
-    color: 'var(--t4)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.06em',
-    padding: '8px 10px 4px',
+    padding: 6,
   },
   item: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '8px 10px',
-    borderRadius: 8,
+    padding: '9px 12px',
+    borderRadius: 10,
     cursor: 'pointer',
     transition: 'background 0.1s',
     userSelect: 'none',
@@ -257,26 +266,30 @@ const styles = {
     gap: 10,
   },
   itemLabel: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 500,
     fontFamily: 'var(--font)',
   },
-  shortcut: {
+  categoryTag: {
     fontSize: 11,
     fontFamily: 'var(--mono)',
-    opacity: 0.7,
+    color: 'var(--t4)',
+    background: 'var(--bg-2)',
+    padding: '2px 8px',
+    borderRadius: 6,
+    letterSpacing: '0.02em',
   },
   empty: {
-    padding: '24px 16px',
+    padding: '32px 16px',
     textAlign: 'center',
     color: 'var(--t4)',
-    fontSize: 13,
+    fontSize: 14,
   },
   footer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
+    gap: 8,
     padding: '10px 16px',
   },
   hint: {
@@ -287,18 +300,22 @@ const styles = {
     gap: 5,
     fontFamily: 'var(--font)',
   },
+  hintDot: {
+    color: 'var(--t4)',
+    fontSize: 11,
+  },
   kbd: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 20,
-    height: 18,
+    height: 20,
     padding: '0 5px',
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'var(--mono)',
     color: 'var(--t3)',
     background: 'var(--bg-3)',
-    border: '1px solid var(--border)',
+    border: '1px solid var(--bg-3)',
     borderRadius: 4,
   },
 }

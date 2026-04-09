@@ -8,7 +8,7 @@ function Toggle({ checked, onChange }) {
       onClick={onChange}
       style={{
         width: 40, height: 22, borderRadius: 11, border: 'none',
-        background: checked ? 'linear-gradient(135deg, #6366f1, #7c3aed)' : '#3a3a42',
+        background: checked ? 'linear-gradient(135deg, var(--accent), var(--accent-h))' : 'var(--t4)',
         cursor: 'pointer', position: 'relative', padding: 0,
         transition: 'background .2s', flexShrink: 0,
       }}
@@ -36,7 +36,7 @@ function ActionBtn({ onClick, children, id }) {
   return (
     <button onClick={handleClick} style={{
       ...s.btn,
-      background: done ? '#34d399' : 'linear-gradient(135deg, #6366f1, #7c3aed)',
+      background: done ? 'var(--green)' : 'linear-gradient(135deg, var(--accent), var(--accent-h))',
       boxShadow: done ? '0 2px 12px rgba(52,211,153,.25)' : '0 2px 12px rgba(99,102,241,.25)',
     }}>
       {done ? 'Done' : children}
@@ -213,7 +213,7 @@ export default function SettingsPage({ state, api, theme, setTheme, themes }) {
         >
           <div style={{ padding: '0 0 6px' }}>
             <div style={s.sectionHeader}>THEME</div>
-            <span style={{ fontSize: 12, color: '#5a5a65' }}>Choose a color scheme</span>
+            <span style={{ fontSize: 12, color: 'var(--t3)' }}>Choose a color scheme</span>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, padding: '14px 0 4px' }}>
             {Object.entries(themes).map(([id, t]) => (
@@ -224,8 +224,8 @@ export default function SettingsPage({ state, api, theme, setTheme, themes }) {
                   padding: '9px 18px',
                   borderRadius: 10,
                   border: theme === id ? `2px solid ${t['--accent']}` : '2px solid rgba(255,255,255,.04)',
-                  background: theme === id ? 'rgba(99,102,241,.08)' : '#17171b',
-                  color: '#f0f0f2',
+                  background: theme === id ? 'var(--accent-soft)' : 'var(--bg-3)',
+                  color: 'var(--t1)',
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -257,10 +257,10 @@ export default function SettingsPage({ state, api, theme, setTheme, themes }) {
             ['Alt+1-9', 'Jump to page'],
             ['Escape', 'Close modal / blur input'],
           ].map(([key, desc]) => (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#94949e' }}>
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--t2)' }}>
               <code style={{
-                background: '#17171b', padding: '3px 10px', borderRadius: 6,
-                fontFamily: 'monospace', fontSize: 11, color: '#f0f0f2',
+                background: 'var(--bg-3)', padding: '3px 10px', borderRadius: 6,
+                fontFamily: 'monospace', fontSize: 11, color: 'var(--t1)',
                 border: '1px solid rgba(255,255,255,.04)',
               }}>{key}</code>
               {desc}
@@ -275,14 +275,14 @@ export default function SettingsPage({ state, api, theme, setTheme, themes }) {
 const s = {
   title: {
     fontSize: 28, fontWeight: 700, letterSpacing: '-.6px',
-    color: '#f0f0f2', marginBottom: 28,
+    color: 'var(--t1)', marginBottom: 28,
   },
   panel: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, maxWidth: 580, overflow: 'hidden', padding: '4px 0',
   },
   sectionHeader: {
-    fontSize: 12, fontWeight: 700, color: '#3a3a42',
+    fontSize: 12, fontWeight: 700, color: 'var(--t4)',
     textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 4,
     padding: '0 22px',
   },
@@ -292,19 +292,19 @@ const s = {
   },
   rowLeft: { display: 'flex', flexDirection: 'column', gap: 2 },
   rowRight: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 },
-  label: { fontSize: 14, fontWeight: 500, color: '#f0f0f2' },
-  hint: { fontSize: 12, color: '#5a5a65' },
+  label: { fontSize: 14, fontWeight: 500, color: 'var(--t1)' },
+  hint: { fontSize: 12, color: 'var(--t3)' },
   divider: { height: 1, background: 'rgba(255,255,255,.03)', margin: '0 22px' },
   input: {
-    padding: '10px 14px', background: '#17171b',
+    padding: '10px 14px', background: 'var(--bg-3)',
     border: '1px solid rgba(255,255,255,.04)', borderRadius: 10,
-    color: '#f0f0f2', fontSize: 13, outline: 'none', width: 160,
+    color: 'var(--t1)', fontSize: 13, outline: 'none', width: 160,
     transition: 'box-shadow .2s, border-color .2s',
   },
   select: {
-    padding: '10px 30px 10px 14px', background: '#17171b',
+    padding: '10px 30px 10px 14px', background: 'var(--bg-3)',
     border: '1px solid rgba(255,255,255,.04)', borderRadius: 10,
-    color: '#f0f0f2', fontSize: 13, outline: 'none',
+    color: 'var(--t1)', fontSize: 13, outline: 'none',
     appearance: 'none',
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%235a5a65'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")`,
     backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',

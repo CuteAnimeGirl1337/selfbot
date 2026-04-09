@@ -69,10 +69,10 @@ export default function Gambling({ state, api }) {
   }
 
   const statCards = [
-    { icon: Users, color: '#818cf8', value: econ.playerCount, label: 'Players' },
-    { icon: Coins, color: '#fbbf24', value: fmt(econ.totalMoney), label: 'Total Money' },
-    { icon: TrendingUp, color: '#34d399', value: fmt(econ.totalWins), label: 'Total Wins' },
-    { icon: TrendingDown, color: '#fb7185', value: fmt(econ.totalLosses), label: 'Total Losses' },
+    { icon: Users, color: 'var(--accent-h)', value: econ.playerCount, label: 'Players' },
+    { icon: Coins, color: 'var(--amber)', value: fmt(econ.totalMoney), label: 'Total Money' },
+    { icon: TrendingUp, color: 'var(--green)', value: fmt(econ.totalWins), label: 'Total Wins' },
+    { icon: TrendingDown, color: 'var(--red)', value: fmt(econ.totalLosses), label: 'Total Losses' },
   ]
 
   return (
@@ -129,7 +129,7 @@ export default function Gambling({ state, api }) {
               <input value={giveId} onChange={e => setGiveId(e.target.value)} placeholder="User ID" style={{ ...s.input, width: 180 }} />
               <input value={giveAmt} onChange={e => setGiveAmt(e.target.value)} placeholder="Amount" style={{ ...s.input, width: 110 }} />
               <button onClick={giveCoins} style={s.btn}><Gift size={13} /> Give Coins</button>
-              <button onClick={resetAll} style={{ ...s.btn, background: '#fb7185' }}><RotateCcw size={13} /> Reset All</button>
+              <button onClick={resetAll} style={{ ...s.btn, background: 'var(--red)' }}><RotateCcw size={13} /> Reset All</button>
             </div>
           </motion.div>
 
@@ -143,7 +143,7 @@ export default function Gambling({ state, api }) {
                   <span style={s.logTag}>{g.userTag}</span>
                   <span style={s.logGame}>{g.game}</span>
                   <span style={s.logBet}>bet {fmt(g.bet)}</span>
-                  <span style={{ ...s.logResult, color: g.profit >= 0 ? '#34d399' : '#fb7185' }}>
+                  <span style={{ ...s.logResult, color: g.profit >= 0 ? 'var(--green)' : 'var(--red)' }}>
                     {g.profit >= 0 ? '+' : ''}{fmt(g.profit)}
                   </span>
                   <span style={s.logTime}>{ago(g.time)}</span>
@@ -195,8 +195,8 @@ export default function Gambling({ state, api }) {
                 <span style={s.playerStat}>💰 {fmt(p.balance)}</span>
                 <span style={s.playerStat}>🏦 {fmt(p.bank)}</span>
                 <span style={s.playerStat}>Lv.{p.level}</span>
-                <span style={{ ...s.playerStat, color: '#34d399' }}>W:{p.wins}</span>
-                <span style={{ ...s.playerStat, color: '#fb7185' }}>L:{p.losses}</span>
+                <span style={{ ...s.playerStat, color: 'var(--green)' }}>W:{p.wins}</span>
+                <span style={{ ...s.playerStat, color: 'var(--red)' }}>L:{p.losses}</span>
                 <button onClick={() => resetPlayer(p.id)} style={s.resetBtn}>Reset</button>
               </div>
             ))}
@@ -215,7 +215,7 @@ export default function Gambling({ state, api }) {
                 <span style={s.logTag}>{g.userTag}</span>
                 <span style={s.logGame}>{g.game}</span>
                 <span style={s.logBet}>bet {fmt(g.bet)}</span>
-                <span style={{ ...s.logResult, color: g.profit >= 0 ? '#34d399' : '#fb7185' }}>
+                <span style={{ ...s.logResult, color: g.profit >= 0 ? 'var(--green)' : 'var(--red)' }}>
                   {g.profit >= 0 ? '+' : ''}{fmt(g.profit)}
                 </span>
                 <span style={s.logTime}>{ago(g.time)}</span>
@@ -244,8 +244,8 @@ const s = {
     pointerEvents: 'none',
   },
   heroContent: { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
-  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: '#f0f0f2' },
-  heroSub: { fontSize: 14, color: '#5a5a65', marginTop: 6, fontWeight: 500 },
+  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: 'var(--t1)' },
+  heroSub: { fontSize: 14, color: 'var(--t3)', marginTop: 6, fontWeight: 500 },
 
   seg: {
     display: 'inline-flex', background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.04)',
@@ -253,18 +253,18 @@ const s = {
   },
   segBtn: {
     padding: '7px 16px', border: 'none', borderRadius: 8, background: 'transparent',
-    color: '#5a5a65', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+    color: 'var(--t3)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
     fontFamily: 'inherit', transition: 'all .15s',
   },
   segActive: {
     background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.12)',
-    color: '#f0f0f2',
+    color: 'var(--t1)',
   },
 
   // Stat cards (centered vertical like Overview)
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 },
   statCard: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, padding: '20px 16px', textAlign: 'center',
     cursor: 'default', transition: 'transform .25s, box-shadow .25s',
   },
@@ -273,29 +273,29 @@ const s = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 12px',
   },
-  statVal: { fontSize: 24, fontWeight: 700, letterSpacing: '-1px', color: '#f0f0f2', lineHeight: 1, fontVariantNumeric: 'tabular-nums' },
-  statLabel: { fontSize: 12, color: '#5a5a65', marginTop: 4, fontWeight: 500 },
+  statVal: { fontSize: 24, fontWeight: 700, letterSpacing: '-1px', color: 'var(--t1)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' },
+  statLabel: { fontSize: 12, color: 'var(--t3)', marginTop: 4, fontWeight: 500 },
 
   // Panels
   panel: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, overflow: 'hidden',
   },
   panelHead: {
-    padding: '16px 20px', fontSize: 12, fontWeight: 700, color: '#3a3a42',
+    padding: '16px 20px', fontSize: 12, fontWeight: 700, color: 'var(--t4)',
     textTransform: 'uppercase', letterSpacing: '.8px',
     borderBottom: '1px solid rgba(255,255,255,.04)',
     display: 'flex', alignItems: 'center',
   },
-  nil: { padding: 40, textAlign: 'center', color: '#3a3a42', fontSize: 14, fontWeight: 500 },
+  nil: { padding: 40, textAlign: 'center', color: 'var(--t4)', fontSize: 14, fontWeight: 500 },
 
   input: {
     padding: '9px 12px', background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.04)',
-    borderRadius: 10, color: '#f0f0f2', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+    borderRadius: 10, color: 'var(--t1)', fontSize: 14, fontFamily: 'inherit', outline: 'none',
     transition: 'border-color .2s',
   },
   btn: {
-    padding: '9px 16px', background: '#6366f1', border: 'none', borderRadius: 10,
+    padding: '9px 16px', background: 'var(--accent)', border: 'none', borderRadius: 10,
     color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
     fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
     transition: 'opacity .15s',
@@ -307,31 +307,31 @@ const s = {
     borderBottom: '1px solid rgba(255,255,255,.03)', fontSize: 14,
   },
   logTag: {
-    fontWeight: 600, color: '#f0f0f2', width: 130, overflow: 'hidden',
+    fontWeight: 600, color: 'var(--t1)', width: 130, overflow: 'hidden',
     textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0,
   },
-  logGame: { fontFamily: 'var(--mono)', color: '#818cf8', fontSize: 13, width: 80, flexShrink: 0 },
-  logBet: { color: '#5a5a65', fontFamily: 'var(--mono)', fontSize: 13, width: 80, flexShrink: 0 },
+  logGame: { fontFamily: 'var(--mono)', color: 'var(--accent-h)', fontSize: 13, width: 80, flexShrink: 0 },
+  logBet: { color: 'var(--t3)', fontFamily: 'var(--mono)', fontSize: 13, width: 80, flexShrink: 0 },
   logResult: { fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, width: 80, flexShrink: 0 },
-  logTime: { color: '#3a3a42', fontFamily: 'var(--mono)', fontSize: 12, marginLeft: 'auto' },
+  logTime: { color: 'var(--t4)', fontFamily: 'var(--mono)', fontSize: 12, marginLeft: 'auto' },
 
   // Leaderboard
   lbRow: {
     display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px',
     borderBottom: '1px solid rgba(255,255,255,.03)',
   },
-  lbRank: { fontFamily: 'var(--mono)', fontSize: 12, color: '#5a5a65', width: 30, flexShrink: 0, fontWeight: 700 },
+  lbRank: { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--t3)', width: 30, flexShrink: 0, fontWeight: 700 },
   lbTag: {
-    fontSize: 14, fontWeight: 600, color: '#f0f0f2', width: 130,
+    fontSize: 14, fontWeight: 600, color: 'var(--t1)', width: 130,
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0,
   },
-  lbBarWrap: { flex: 1, height: 6, background: '#17171b', borderRadius: 3, overflow: 'hidden' },
-  lbBar: { height: '100%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)', borderRadius: 3 },
+  lbBarWrap: { flex: 1, height: 6, background: 'var(--bg-3)', borderRadius: 3, overflow: 'hidden' },
+  lbBar: { height: '100%', background: 'linear-gradient(90deg, var(--amber), #f59e0b)', borderRadius: 3 },
   lbTotal: {
-    fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: '#fbbf24',
+    fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: 'var(--amber)',
     width: 60, textAlign: 'right', flexShrink: 0,
   },
-  lbLvl: { fontFamily: 'var(--mono)', fontSize: 12, color: '#5a5a65', width: 40, textAlign: 'right', flexShrink: 0 },
+  lbLvl: { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--t3)', width: 40, textAlign: 'right', flexShrink: 0 },
 
   // Players
   playerRow: {
@@ -339,12 +339,12 @@ const s = {
     borderBottom: '1px solid rgba(255,255,255,.03)', fontSize: 14,
   },
   playerInfo: { display: 'flex', flexDirection: 'column', width: 160, flexShrink: 0 },
-  playerTag: { fontWeight: 600, fontSize: 14, color: '#f0f0f2' },
-  playerId: { fontFamily: 'var(--mono)', fontSize: 11, color: '#3a3a42' },
-  playerStat: { fontFamily: 'var(--mono)', fontSize: 12, color: '#94949e', width: 70, textAlign: 'center', flexShrink: 0 },
+  playerTag: { fontWeight: 600, fontSize: 14, color: 'var(--t1)' },
+  playerId: { fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--t4)' },
+  playerStat: { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--t2)', width: 70, textAlign: 'center', flexShrink: 0 },
   resetBtn: {
     padding: '4px 10px', background: 'transparent', border: '1px solid rgba(251,113,133,.15)',
-    color: '#fb7185', borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+    color: 'var(--red)', borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer',
     fontFamily: 'inherit', marginLeft: 'auto', transition: 'background .15s',
   },
 }

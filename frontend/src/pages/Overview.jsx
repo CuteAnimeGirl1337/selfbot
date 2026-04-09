@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import {
   MessageSquare, Zap, Globe, Crosshair, Activity, Eye,
   TrendingUp, Clock, ArrowRight, ChevronRight,
-  Music, Gamepad2, MonitorPlay, Radio, Trophy, Headphones
+  Music, Gamepad2, MonitorPlay, Radio, Trophy, Headphones,
+  EyeOff, Wifi, Moon, XCircle
 } from 'lucide-react'
 
 const fmt = n => {
@@ -23,11 +24,11 @@ const ago = ts => {
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }
 
 const cards = [
-  { key: 'messages', icon: MessageSquare, color: '#818cf8', label: 'Messages' },
-  { key: 'commands', icon: Zap, color: '#c084fc', label: 'Commands' },
-  { key: 'servers', icon: Globe, color: '#34d399', label: 'Servers' },
-  { key: 'snipes', icon: Crosshair, color: '#fbbf24', label: 'Sniped' },
-  { key: 'msgRate', icon: Activity, color: '#22d3ee', label: 'Msg/min' },
+  { key: 'messages', icon: MessageSquare, color: 'var(--accent-h)', label: 'Messages' },
+  { key: 'commands', icon: Zap, color: 'var(--purple)', label: 'Commands' },
+  { key: 'servers', icon: Globe, color: 'var(--green)', label: 'Servers' },
+  { key: 'snipes', icon: Crosshair, color: 'var(--amber)', label: 'Sniped' },
+  { key: 'msgRate', icon: Activity, color: 'var(--cyan)', label: 'Msg/min' },
   { key: 'spy', icon: Eye, color: '#f472b6', label: 'Spying' },
 ]
 
@@ -111,25 +112,48 @@ const np = {
     border: '1px solid rgba(99,102,241,.06)',
     borderRadius: 14, position: 'relative', overflow: 'hidden',
   },
-  art: { width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0, background: '#17171b' },
+  art: { width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0, background: 'var(--bg-3)' },
   artFallback: {
     width: 56, height: 56, borderRadius: 10, flexShrink: 0,
     background: 'rgba(99,102,241,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#818cf8',
+    color: 'var(--accent-h)',
   },
   info: { flex: 1, minWidth: 0 },
-  typeRow: { display: 'flex', alignItems: 'center', gap: 6, color: '#5a5a65', marginBottom: 3 },
+  typeRow: { display: 'flex', alignItems: 'center', gap: 6, color: 'var(--t3)', marginBottom: 3 },
   type: { fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px' },
-  elapsed: { fontSize: 11, fontFamily: 'var(--mono)', color: '#3a3a42', marginLeft: 'auto' },
-  name: { fontSize: 15, fontWeight: 600, color: '#f0f0f2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  details: { fontSize: 13, color: '#94949e', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  state: { fontSize: 12, color: '#5a5a65', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  barBg: { height: 3, background: '#1e1e23', borderRadius: 2, marginTop: 6, overflow: 'hidden' },
-  barFill: { height: '100%', background: 'linear-gradient(90deg, #6366f1, #818cf8)', borderRadius: 2 },
+  elapsed: { fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--t4)', marginLeft: 'auto' },
+  name: { fontSize: 15, fontWeight: 600, color: 'var(--t1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  details: { fontSize: 13, color: 'var(--t2)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  state: { fontSize: 12, color: 'var(--t3)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  barBg: { height: 3, background: 'var(--bg-4)', borderRadius: 2, marginTop: 6, overflow: 'hidden' },
+  barFill: { height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--accent-h))', borderRadius: 2 },
   smallArt: { width: 24, height: 24, borderRadius: 6, objectFit: 'cover', position: 'absolute', bottom: 10, right: 14 },
 }
 
-export default function Overview({ state, logs }) {
+function QuickAction({ icon: Icon, label, onClick }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '10px 16px', borderRadius: 12,
+        background: hov ? 'var(--bg-2)' : 'var(--bg-1)',
+        border: '1px solid rgba(255,255,255,.04)',
+        color: hov ? 'var(--t1)' : 'var(--t2)',
+        fontSize: 13, fontWeight: 500, fontFamily: 'var(--font)',
+        cursor: 'pointer', transition: 'all .15s',
+      }}
+    >
+      <Icon size={15} />
+      {label}
+    </button>
+  )
+}
+
+export default function Overview({ state, logs, api }) {
   if (!state) return (
     <div style={s.page}>
       <div style={{ ...s.skeleton, height: 120, borderRadius: 20, marginBottom: 20 }} />
@@ -155,7 +179,7 @@ export default function Overview({ state, logs }) {
         <div style={s.heroGlow} />
         <div style={s.heroContent}>
           <div>
-            <h1 style={s.heroTitle}>Welcome back</h1>
+            <h1 style={s.heroTitle}>Welcome back{state.user ? `, ${state.user.tag.split('#')[0]}` : ''}</h1>
             <p style={s.heroSub}>{guilds.length} servers · {fmt(stats.messagesSeen)} messages · {fmt(stats.commandsRun)} commands</p>
           </div>
           <div style={s.heroPills}>
@@ -195,16 +219,29 @@ export default function Overview({ state, logs }) {
       {/* Economy strip */}
       {econ.playerCount > 0 && (
         <motion.div style={s.econStrip} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <TrendingUp size={15} color="#fbbf24" />
+          <TrendingUp size={15} color="var(--amber)" />
           <span><b>{econ.playerCount}</b> players</span>
           <span style={s.econDot}>·</span>
           <span><b>{fmt(econ.totalMoney)}</b> coins</span>
           <span style={s.econDot}>·</span>
-          <span style={{ color: '#34d399' }}><b>{econ.totalWins}</b> wins</span>
+          <span style={{ color: 'var(--green)' }}><b>{econ.totalWins}</b> wins</span>
           <span style={s.econDot}>·</span>
-          <span style={{ color: '#fb7185' }}><b>{econ.totalLosses}</b> losses</span>
+          <span style={{ color: 'var(--red)' }}><b>{econ.totalLosses}</b> losses</span>
         </motion.div>
       )}
+
+      {/* Quick Actions */}
+      <motion.div
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: .2 }}
+      >
+        <QuickAction icon={EyeOff} label="Go Invisible" onClick={() => api?.('/api/presence', { status: 'invisible' })} />
+        <QuickAction icon={Wifi} label="Go Online" onClick={() => api?.('/api/presence', { status: 'online' })} />
+        <QuickAction icon={Moon} label="Toggle AFK" onClick={() => api?.('/api/afk/toggle')} />
+        <QuickAction icon={XCircle} label="Clear Status" onClick={() => api?.('/api/status/clear')} />
+      </motion.div>
 
       {/* Two columns */}
       <div style={s.columns}>
@@ -258,7 +295,7 @@ export default function Overview({ state, logs }) {
               >
                 <div style={{
                   ...s.actDot,
-                  background: l.level === 'error' ? '#fb7185' : l.level === 'warn' ? '#fbbf24' : '#818cf8',
+                  background: l.level === 'error' ? 'var(--red)' : l.level === 'warn' ? 'var(--amber)' : 'var(--accent-h)',
                   boxShadow: `0 0 8px ${l.level === 'error' ? 'rgba(251,113,133,.4)' : l.level === 'warn' ? 'rgba(251,191,36,.3)' : 'rgba(129,140,248,.3)'}`,
                 }} />
                 <span style={s.actTime}>{ago(l.time)}</span>
@@ -276,7 +313,7 @@ const s = {
   page: { padding: '32px 40px 48px' },
 
   skeleton: {
-    background: 'linear-gradient(90deg, #0e0e12 25%, #17171b 50%, #0e0e12 75%)',
+    background: 'linear-gradient(90deg, var(--bg-1) 25%, var(--bg-3) 50%, var(--bg-1) 75%)',
     backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite',
   },
 
@@ -293,21 +330,21 @@ const s = {
     pointerEvents: 'none',
   },
   heroContent: { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: '#f0f0f2' },
-  heroSub: { fontSize: 14, color: '#5a5a65', marginTop: 6, fontWeight: 500 },
+  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: 'var(--t1)' },
+  heroSub: { fontSize: 14, color: 'var(--t3)', marginTop: 6, fontWeight: 500 },
   heroPills: { display: 'flex', gap: 8 },
   pill: {
     display: 'flex', alignItems: 'center', gap: 6,
     padding: '8px 14px', borderRadius: 10,
     background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)',
-    fontSize: 12, color: '#94949e', fontFamily: 'var(--mono)', fontWeight: 600,
+    fontSize: 12, color: 'var(--t2)', fontFamily: 'var(--mono)', fontWeight: 600,
   },
-  pillGreen: { background: 'rgba(52,211,153,.06)', borderColor: 'rgba(52,211,153,.1)', color: '#34d399' },
+  pillGreen: { background: 'rgba(52,211,153,.06)', borderColor: 'rgba(52,211,153,.1)', color: 'var(--green)' },
 
   // Stats
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 20 },
   statCard: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, padding: '20px 16px', textAlign: 'center',
     cursor: 'default', transition: 'transform .25s, box-shadow .25s',
   },
@@ -316,49 +353,49 @@ const s = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 12px',
   },
-  statVal: { fontSize: 24, fontWeight: 700, letterSpacing: '-1px', color: '#f0f0f2', lineHeight: 1, fontVariantNumeric: 'tabular-nums' },
-  statLabel: { fontSize: 12, color: '#5a5a65', marginTop: 4, fontWeight: 500 },
+  statVal: { fontSize: 24, fontWeight: 700, letterSpacing: '-1px', color: 'var(--t1)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' },
+  statLabel: { fontSize: 12, color: 'var(--t3)', marginTop: 4, fontWeight: 500 },
 
   // Economy
   econStrip: {
     display: 'flex', alignItems: 'center', gap: 10,
     padding: '12px 18px', borderRadius: 12, marginBottom: 20,
     background: 'rgba(251,191,36,.03)', border: '1px solid rgba(251,191,36,.06)',
-    fontSize: 13, color: '#94949e', fontWeight: 500,
+    fontSize: 13, color: 'var(--t2)', fontWeight: 500,
   },
-  econDot: { color: '#3a3a42' },
+  econDot: { color: 'var(--t4)' },
 
   // Columns
   columns: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
 
   // Panel
   panel: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, overflow: 'hidden',
   },
   panelHeader: {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
     padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,.04)',
-    fontSize: 12, fontWeight: 700, color: '#3a3a42', textTransform: 'uppercase', letterSpacing: '.8px',
+    fontSize: 12, fontWeight: 700, color: 'var(--t4)', textTransform: 'uppercase', letterSpacing: '.8px',
   },
   panelCount: {
     fontSize: 11, fontFamily: 'var(--mono)', fontWeight: 600,
-    background: '#17171b', color: '#5a5a65', padding: '2px 8px', borderRadius: 6,
+    background: 'var(--bg-3)', color: 'var(--t3)', padding: '2px 8px', borderRadius: 6,
   },
   panelContent: { padding: 8 },
-  empty: { padding: 40, textAlign: 'center', color: '#3a3a42', fontSize: 14, fontWeight: 500 },
+  empty: { padding: 40, textAlign: 'center', color: 'var(--t4)', fontSize: 14, fontWeight: 500 },
 
   // Commands
   cmdRow: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderRadius: 8 },
-  cmdRank: { fontFamily: 'var(--mono)', fontSize: 11, color: '#3a3a42', width: 18, textAlign: 'right', fontWeight: 700 },
-  cmdName: { fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 600, color: '#818cf8', width: 80 },
-  cmdBarBg: { flex: 1, height: 4, background: '#17171b', borderRadius: 2, overflow: 'hidden' },
-  cmdBarFill: { height: '100%', background: 'linear-gradient(90deg, #6366f1, #818cf8)', borderRadius: 2 },
-  cmdCount: { fontFamily: 'var(--mono)', fontSize: 12, color: '#5a5a65', width: 36, textAlign: 'right', fontWeight: 600 },
+  cmdRank: { fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--t4)', width: 18, textAlign: 'right', fontWeight: 700 },
+  cmdName: { fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 600, color: 'var(--accent-h)', width: 80 },
+  cmdBarBg: { flex: 1, height: 4, background: 'var(--bg-3)', borderRadius: 2, overflow: 'hidden' },
+  cmdBarFill: { height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--accent-h))', borderRadius: 2 },
+  cmdCount: { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--t3)', width: 36, textAlign: 'right', fontWeight: 600 },
 
   // Activity
-  actRow: { display: 'flex', gap: 10, padding: '6px 14px', fontSize: 13, color: '#94949e', alignItems: 'center' },
+  actRow: { display: 'flex', gap: 10, padding: '6px 14px', fontSize: 13, color: 'var(--t2)', alignItems: 'center' },
   actDot: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0 },
-  actTime: { fontFamily: 'var(--mono)', fontSize: 11, color: '#3a3a42', width: 28, textAlign: 'right', fontWeight: 600 },
+  actTime: { fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--t4)', width: 28, textAlign: 'right', fontWeight: 600 },
   actMsg: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
 }

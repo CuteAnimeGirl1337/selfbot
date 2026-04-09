@@ -56,7 +56,7 @@ export default function Sidebar({ active, setActive, user, uptime, connected, on
           <>
             <div style={st.avatarBox}>
               <img src={user.avatar} alt="" style={st.avatar} />
-              <div style={{ ...st.dot, background: { online:'#34d399', idle:'#fbbf24', dnd:'#fb7185', invisible:'#3a3a42' }[user.status] || '#34d399' }} />
+              <div style={{ ...st.dot, background: { online:'var(--green)', idle:'var(--amber)', dnd:'var(--red)', invisible:'var(--t4)' }[user.status] || 'var(--green)' }} />
             </div>
             <div style={st.userInfo}>
               <div style={st.tag}>{user.tag}</div>
@@ -64,7 +64,17 @@ export default function Sidebar({ active, setActive, user, uptime, connected, on
             </div>
           </>
         ) : (
-          <span style={{ ...st.tag, color: '#5a5a65' }}>{connected ? 'Logging in...' : 'Connecting...'}</span>
+          <>
+            <div style={st.avatarBox}>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--bg-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <User size={16} style={{ color: 'var(--t4)' }} />
+              </div>
+            </div>
+            <div style={st.userInfo}>
+              <div style={{ ...st.tag, color: 'var(--t4)' }}>{connected ? 'Not logged in' : 'Connecting...'}</div>
+              <div style={st.uid}>Open dashboard to connect</div>
+            </div>
+          </>
         )}
       </div>
 
@@ -107,7 +117,7 @@ export default function Sidebar({ active, setActive, user, uptime, connected, on
       {/* Footer */}
       <div style={st.footer}>
         <div style={st.footerRow}>
-          <div style={{ width: 7, height: 7, borderRadius: '50%', background: connected ? '#34d399' : '#fb7185' }} />
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: connected ? 'var(--green)' : 'var(--red)' }} />
           <span style={st.uptime}>{uptime}</span>
           <kbd style={st.kbd}>⌘K</kbd>
         </div>
@@ -120,7 +130,7 @@ export default function Sidebar({ active, setActive, user, uptime, connected, on
               ...st.logout,
               background: logHov ? 'rgba(251,113,133,.06)' : 'transparent',
               borderColor: logHov ? 'rgba(251,113,133,.15)' : 'rgba(255,255,255,.04)',
-              color: logHov ? '#fb7185' : '#3a3a42',
+              color: logHov ? 'var(--red)' : 'var(--t4)',
             }}
           >
             <LogOut size={13} /> Logout
@@ -145,37 +155,37 @@ const st = {
     borderBottom: '1px solid rgba(255,255,255,.03)',
   },
   avatarBox: { position: 'relative', flexShrink: 0 },
-  avatar: { width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', background: '#17171b' },
+  avatar: { width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', background: 'var(--bg-3)' },
   dot: {
     position: 'absolute', bottom: -1, right: -1,
     width: 11, height: 11, borderRadius: '50%',
     border: '2.5px solid #0a0a0e',
   },
   userInfo: { overflow: 'hidden' },
-  tag: { fontSize: 14, fontWeight: 600, letterSpacing: '-.2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#f0f0f2' },
-  uid: { fontSize: 11, color: '#3a3a42', fontFamily: 'var(--mono)', marginTop: 1 },
+  tag: { fontSize: 14, fontWeight: 600, letterSpacing: '-.2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--t1)' },
+  uid: { fontSize: 11, color: 'var(--t4)', fontFamily: 'var(--mono)', marginTop: 1 },
 
   nav: { flex: 1, padding: '8px 8px', overflowY: 'auto', overflowX: 'hidden' },
   label: {
     fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-    letterSpacing: '1.2px', color: '#3a3a42',
+    letterSpacing: '1.2px', color: 'var(--t4)',
     padding: '12px 12px 6px',
   },
   item: {
     display: 'flex', alignItems: 'center', gap: 10,
     padding: '8px 12px', borderRadius: 10, width: '100%', textAlign: 'left',
     border: 'none', background: 'transparent',
-    color: '#94949e', fontSize: 14, fontWeight: 500,
+    color: 'var(--t2)', fontSize: 14, fontWeight: 500,
     cursor: 'pointer', position: 'relative',
     letterSpacing: '-.1px', transition: 'color .12s, background .12s',
     fontFamily: 'var(--font)',
   },
-  itemActive: { color: '#f0f0f2' },
-  itemHov: { color: '#f0f0f2', background: 'rgba(255,255,255,.03)' },
+  itemActive: { color: 'var(--t1)' },
+  itemHov: { color: 'var(--t1)', background: 'rgba(255,255,255,.03)' },
   pill: {
     position: 'absolute', inset: 0, borderRadius: 10,
-    background: 'rgba(99,102,241,.08)',
-    border: '1px solid rgba(99,102,241,.12)',
+    background: 'var(--accent-soft)',
+    border: '1px solid var(--glow)',
   },
 
   footer: {
@@ -183,10 +193,10 @@ const st = {
     display: 'flex', flexDirection: 'column', gap: 8,
   },
   footerRow: { display: 'flex', alignItems: 'center', gap: 8 },
-  uptime: { fontSize: 12, fontFamily: 'var(--mono)', color: '#3a3a42', fontWeight: 600 },
+  uptime: { fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--t4)', fontWeight: 600 },
   kbd: {
     marginLeft: 'auto', fontSize: 10, fontFamily: 'var(--mono)',
-    color: '#25252b', background: '#17171b', padding: '2px 6px',
+    color: 'var(--t5)', background: 'var(--bg-3)', padding: '2px 6px',
     borderRadius: 4, fontWeight: 600, border: '1px solid rgba(255,255,255,.04)',
   },
   logout: {

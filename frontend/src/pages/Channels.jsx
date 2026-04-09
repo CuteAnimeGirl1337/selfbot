@@ -75,7 +75,17 @@ export default function Channels({ state, api }) {
             <span style={s.guildName}>{g.name}</span>
           </button>
         ))}
-        {guilds.length === 0 && <div style={s.nil}>No servers</div>}
+        {guilds.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}
+          >
+            <Hash size={48} color="var(--t4)" strokeWidth={1.5} />
+            <span style={{ fontSize: 16, color: 'var(--t3)', fontWeight: 500 }}>No servers</span>
+            <span style={{ fontSize: 13, color: 'var(--t4)' }}>Connect to Discord to browse server channels</span>
+          </motion.div>
+        )}
       </div>
 
       {/* Channels */}

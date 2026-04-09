@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useToast } from '../components/Toast'
-import { UserPlus, Trash2, Circle, Clock, Activity, Palette, AtSign, Gamepad2 } from 'lucide-react'
+import { UserPlus, Trash2, Circle, Clock, Activity, Palette, AtSign, Gamepad2, UserSearch } from 'lucide-react'
 
 const ago = ts => {
   if (!ts) return 'never'
@@ -14,20 +14,20 @@ const ago = ts => {
 }
 
 const statusColor = status => {
-  if (status === 'online') return '#34d399'
-  if (status === 'idle') return '#fbbf24'
-  if (status === 'dnd') return '#fb7185'
-  return '#3a3a42'
+  if (status === 'online') return 'var(--green)'
+  if (status === 'idle') return 'var(--amber)'
+  if (status === 'dnd') return 'var(--red)'
+  return 'var(--t4)'
 }
 
 const eventIcon = type => {
-  if (type === 'online') return { icon: Circle, color: '#34d399' }
-  if (type === 'offline') return { icon: Circle, color: '#3a3a42' }
-  if (type === 'status') return { icon: Activity, color: '#c084fc' }
+  if (type === 'online') return { icon: Circle, color: 'var(--green)' }
+  if (type === 'offline') return { icon: Circle, color: 'var(--t4)' }
+  if (type === 'status') return { icon: Activity, color: 'var(--purple)' }
   if (type === 'avatar') return { icon: Palette, color: '#3b82f6' }
-  if (type === 'username') return { icon: AtSign, color: '#fbbf24' }
-  if (type === 'activity') return { icon: Gamepad2, color: '#22d3ee' }
-  return { icon: Circle, color: '#5a5a65' }
+  if (type === 'username') return { icon: AtSign, color: 'var(--amber)' }
+  if (type === 'activity') return { icon: Gamepad2, color: 'var(--cyan)' }
+  return { icon: Circle, color: 'var(--t3)' }
 }
 
 const fmtDuration = ms => {
@@ -110,7 +110,17 @@ export default function Tracker({ api }) {
         <motion.div style={s.panel} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .15 }}>
           <div style={s.panelHead}><Clock size={14} style={{ marginRight: 6 }} /> Tracked Users</div>
           <div style={s.panelBody}>
-            {users.length === 0 && <div style={s.nil}>No tracked users</div>}
+            {users.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}
+              >
+                <UserSearch size={48} color="var(--t4)" strokeWidth={1.5} />
+                <span style={{ fontSize: 16, color: 'var(--t3)', fontWeight: 500 }}>No tracked users</span>
+                <span style={{ fontSize: 13, color: 'var(--t4)' }}>Add a user ID above to start tracking</span>
+              </motion.div>
+            )}
             {users.map((u, i) => (
               <motion.div
                 key={u.userId || i}
@@ -146,7 +156,17 @@ export default function Tracker({ api }) {
         <motion.div style={s.panel} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .2 }}>
           <div style={s.panelHead}><Activity size={14} style={{ marginRight: 6 }} /> Activity Timeline</div>
           <div style={{ ...s.panelBody, maxHeight: 500, overflowY: 'auto' }}>
-            {history.length === 0 && <div style={s.nil}>No activity recorded</div>}
+            {history.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}
+              >
+                <Activity size={48} color="var(--t4)" strokeWidth={1.5} />
+                <span style={{ fontSize: 16, color: 'var(--t3)', fontWeight: 500 }}>No activity recorded</span>
+                <span style={{ fontSize: 13, color: 'var(--t4)' }}>Status changes will appear as users come online</span>
+              </motion.div>
+            )}
             {history.map((ev, i) => {
               const { icon: Icon, color } = eventIcon(ev.type)
               return (
@@ -191,33 +211,33 @@ const s = {
     pointerEvents: 'none',
   },
   heroContent: { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: '#f0f0f2' },
-  heroSub: { fontSize: 14, color: '#5a5a65', marginTop: 6, fontWeight: 500 },
+  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: 'var(--t1)' },
+  heroSub: { fontSize: 14, color: 'var(--t3)', marginTop: 6, fontWeight: 500 },
 
   cols: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 },
 
   panel: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, overflow: 'hidden',
   },
   panelHead: {
-    padding: '16px 20px', fontSize: 12, fontWeight: 700, color: '#3a3a42',
+    padding: '16px 20px', fontSize: 12, fontWeight: 700, color: 'var(--t4)',
     textTransform: 'uppercase', letterSpacing: '.8px',
     borderBottom: '1px solid rgba(255,255,255,.04)',
     display: 'flex', alignItems: 'center',
   },
   panelBody: { padding: 12 },
-  nil: { padding: 40, textAlign: 'center', color: '#3a3a42', fontSize: 14, fontWeight: 500 },
+  nil: { padding: 40, textAlign: 'center', color: 'var(--t4)', fontSize: 14, fontWeight: 500 },
 
   addRow: { display: 'flex', gap: 8 },
   input: {
     flex: 1, padding: '9px 12px', background: 'rgba(255,255,255,.03)',
     border: '1px solid rgba(255,255,255,.04)', borderRadius: 10,
-    color: '#f0f0f2', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+    color: 'var(--t1)', fontSize: 14, fontFamily: 'inherit', outline: 'none',
     transition: 'border-color .2s',
   },
   btn: {
-    padding: '9px 18px', background: '#6366f1', border: 'none', borderRadius: 10,
+    padding: '9px 18px', background: 'var(--accent)', border: 'none', borderRadius: 10,
     color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
   },
 
@@ -230,15 +250,15 @@ const s = {
   statusDot: {
     width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
   },
-  userTag: { fontSize: 14, fontWeight: 600, color: '#f0f0f2' },
+  userTag: { fontSize: 14, fontWeight: 600, color: 'var(--t1)' },
   userMeta: {
-    fontSize: 12, color: '#5a5a65', marginTop: 3,
+    fontSize: 12, color: 'var(--t3)', marginTop: 3,
     display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
   },
-  userId: { fontFamily: 'var(--mono)', fontSize: 11, color: '#3a3a42' },
-  sep: { color: '#25252b' },
+  userId: { fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--t4)' },
+  sep: { color: 'var(--t5)' },
   removeBtn: {
-    background: 'transparent', border: 'none', color: '#fb7185',
+    background: 'transparent', border: 'none', color: 'var(--red)',
     cursor: 'pointer', display: 'flex', padding: 6, opacity: .7,
     borderRadius: 8, transition: 'opacity .15s',
   },
@@ -251,7 +271,7 @@ const s = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     width: 26, height: 26, borderRadius: 8, flexShrink: 0,
   },
-  eventTag: { fontWeight: 600, color: '#f0f0f2', marginRight: 6 },
-  eventDesc: { color: '#94949e' },
-  eventTime: { fontSize: 12, color: '#3a3a42', flexShrink: 0, marginLeft: 'auto', fontFamily: 'var(--mono)' },
+  eventTag: { fontWeight: 600, color: 'var(--t1)', marginRight: 6 },
+  eventDesc: { color: 'var(--t2)' },
+  eventTime: { fontSize: 12, color: 'var(--t4)', flexShrink: 0, marginLeft: 'auto', fontFamily: 'var(--mono)' },
 }

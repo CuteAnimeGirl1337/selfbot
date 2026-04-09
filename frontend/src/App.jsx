@@ -121,7 +121,7 @@ function AppInner() {
 
   const renderPage = () => {
     switch (page) {
-      case 'overview': return <Overview state={state} logs={logs} />
+      case 'overview': return <Overview state={state} logs={logs} api={api} />
       case 'discord': return <Discord state={state} api={api} feed={discordEvents} />
       case 'live': return <LiveFeed feed={feed} />
       case 'terminal': return <TerminalPage api={api} state={state} />
@@ -195,10 +195,10 @@ function AppInner() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={page}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: .2, ease: [.22, 1, .36, 1] }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
                 style={{ minHeight: '100%' }}
               >
                 <Suspense fallback={<PageLoader />}>

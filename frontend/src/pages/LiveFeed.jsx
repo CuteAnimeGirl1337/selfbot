@@ -64,7 +64,15 @@ export default function LiveFeed({ feed }) {
       <div style={s.feed}>
         <AnimatePresence initial={false}>
           {items.length === 0 && (
-            <div style={s.nil}>Waiting for commands...</div>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}
+            >
+              <Radio size={48} color="var(--t4)" strokeWidth={1.5} />
+              <span style={{ fontSize: 16, color: 'var(--t3)', fontWeight: 500 }}>Waiting for commands...</span>
+              <span style={{ fontSize: 13, color: 'var(--t4)' }}>Commands and responses will stream here in real-time</span>
+            </motion.div>
           )}
           {items.map((item, i) => (
             <motion.div

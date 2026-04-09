@@ -8,7 +8,7 @@ function Toggle({ checked, onChange }) {
       onClick={onChange}
       style={{
         width: 38, height: 20, borderRadius: 10, border: 'none',
-        background: checked ? '#6366f1' : '#25252b',
+        background: checked ? 'var(--accent)' : 'var(--t5)',
         cursor: 'pointer', position: 'relative', padding: 0,
         transition: 'background .2s',
       }}
@@ -18,7 +18,7 @@ function Toggle({ checked, onChange }) {
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         style={{
           width: 16, height: 16, borderRadius: '50%',
-          background: '#f0f0f2', position: 'absolute', top: 2, left: 2,
+          background: 'var(--t1)', position: 'absolute', top: 2, left: 2,
           boxShadow: '0 1px 3px rgba(0,0,0,.3)',
         }}
       />
@@ -53,7 +53,7 @@ export default function Commands({ state, lastCmd, api }) {
             borderColor: searchFocus ? 'rgba(99,102,241,.3)' : 'rgba(255,255,255,.04)',
             boxShadow: searchFocus ? '0 0 20px rgba(99,102,241,.1)' : 'none',
           }}>
-            <Search size={14} color="#5a5a65" />
+            <Search size={14} color="var(--t3)" />
             <input
               value={filter}
               onChange={e => setFilter(e.target.value)}
@@ -78,13 +78,12 @@ export default function Commands({ state, lastCmd, api }) {
           {filtered.map((cmd, i) => {
             const flash = lastCmd?.name === cmd.name && Date.now() - lastCmd.at < 800
             return (
-              <motion.div
+              <div
                 key={cmd.name}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: cmd.enabled ? 1 : .3 }}
                 style={{
                   ...s.tr,
-                  ...(flash ? { boxShadow: 'inset 3px 0 0 #34d399' } : {}),
+                  opacity: cmd.enabled ? 1 : .3,
+                  ...(flash ? { boxShadow: 'inset 3px 0 0 var(--green)' } : {}),
                 }}
               >
                 <span style={s.cmdName}>{config.prefix}{cmd.name}</span>
@@ -93,7 +92,7 @@ export default function Commands({ state, lastCmd, api }) {
                 <span style={{ width: 50, display: 'flex', justifyContent: 'flex-end' }}>
                   <Toggle checked={cmd.enabled} onChange={() => toggle(cmd.name)} />
                 </span>
-              </motion.div>
+              </div>
             )
           })}
         </div>
@@ -118,8 +117,8 @@ const s = {
     pointerEvents: 'none',
   },
   heroContent: { position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: '#f0f0f2' },
-  heroSub: { fontSize: 14, color: '#5a5a65', marginTop: 6, fontWeight: 500 },
+  heroTitle: { fontSize: 28, fontWeight: 700, letterSpacing: '-.6px', color: 'var(--t1)' },
+  heroSub: { fontSize: 14, color: 'var(--t3)', marginTop: 6, fontWeight: 500 },
 
   search: {
     display: 'flex', alignItems: 'center', gap: 8,
@@ -129,11 +128,11 @@ const s = {
   },
   input: {
     background: 'transparent', border: 'none', outline: 'none',
-    color: '#f0f0f2', fontSize: 14, width: 200, fontFamily: 'inherit',
+    color: 'var(--t1)', fontSize: 14, width: 200, fontFamily: 'inherit',
   },
 
   table: {
-    background: '#0c0c0f', border: '1px solid rgba(255,255,255,.04)',
+    background: 'var(--bg-1)', border: '1px solid rgba(255,255,255,.04)',
     borderRadius: 16, overflow: 'hidden',
   },
   thead: {
@@ -141,7 +140,7 @@ const s = {
     borderBottom: '1px solid rgba(255,255,255,.04)',
   },
   th: {
-    fontSize: 12, fontWeight: 700, color: '#3a3a42',
+    fontSize: 12, fontWeight: 700, color: 'var(--t4)',
     textTransform: 'uppercase', letterSpacing: '.8px',
   },
   tbody: { maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' },
@@ -152,11 +151,11 @@ const s = {
   },
   cmdName: {
     fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 600,
-    color: '#818cf8', width: 160, flexShrink: 0,
+    color: 'var(--accent-h)', width: 160, flexShrink: 0,
   },
-  cmdDesc: { flex: 1, fontSize: 14, color: '#94949e' },
+  cmdDesc: { flex: 1, fontSize: 14, color: 'var(--t2)' },
   cmdUses: {
-    fontFamily: 'var(--mono)', fontSize: 13, color: '#5a5a65',
+    fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--t3)',
     width: 60, textAlign: 'right', flexShrink: 0,
   },
 }

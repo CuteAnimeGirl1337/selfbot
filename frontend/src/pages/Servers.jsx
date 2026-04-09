@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Globe } from 'lucide-react'
 import { useToast } from '../components/Toast'
 
 export default function Servers({ state, api }) {
